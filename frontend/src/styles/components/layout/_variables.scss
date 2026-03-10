@@ -1,0 +1,18 @@
+// Layout Shared Variables
+@use "../../base/variables" as v;
+
+// Export all colors from base
+$farm-primary: v.$farm-primary;
+$farm-secondary: v.$farm-secondary;
+$farm-accent: v.$farm-accent;
+$farm-success: v.$farm-success;
+$farm-warning: v.$farm-warning;
+$farm-danger: v.$farm-danger;
+$farm-earth: v.$farm-earth;
+$farm-cream: v.$farm-cream;
+$farm-sky: v.$farm-sky;
+$white: v.$white;
+$gray-100: v.$gray-100;
+$gray-600: v.$gray-600;
+$gray-800: v.$gray-800;
+

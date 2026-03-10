@@ -1,0 +1,16 @@
+// Main Style Entry - Agricultural Theme
+@use "base";
+@use "base/variables" as v;
+@use "components/layout";
+@use "pages/dashboard";
+@use "pages/auth";
+@use "pages/livestock";
+
+// Global styles that need variables
+:root {
+  --farm-primary: #{v.$farm-primary};
+  --farm-secondary: #{v.$farm-secondary};
+  --farm-accent: #{v.$farm-accent};
+  --farm-cream: #{v.$farm-cream};
+}
+

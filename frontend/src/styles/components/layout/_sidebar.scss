@@ -1,0 +1,169 @@
+// Sidebar - Agricultural Theme
+@use "sass:color";
+@use "./variables" as v;
+
+.sidebar {
+  &__header {
+    display: flex;
+    align-items: center;
+    padding: 24px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 16px;
+  }
+
+  &__logo-mark {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, v.$farm-accent 0%, color.adjust(v.$farm-accent, $lightness: -10%) 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-right: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+  }
+
+  &__logo-text {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__logo-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: v.$white;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+  }
+
+  &__logo-subtitle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  // Logout Button Styles
+  &__footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
+  }
+
+  &__logout-btn {
+    width: 100%;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 10px !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    transition: all 0.3s ease !important;
+
+    .anticon {
+      font-size: 16px !important;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover {
+      background: linear-gradient(135deg, v.$farm-danger 0%, color.adjust(v.$farm-danger, $lightness: -10%) 100%) !important;
+      border-color: transparent !important;
+      color: v.$white !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(196, 69, 54, 0.4);
+
+      .anticon {
+        transform: scale(1.1);
+      }
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(196, 69, 54, 0.3);
+    }
+  }
+}
+
+.ant-menu {
+  background: transparent !important;
+  border-right: none !important;
+  padding: 0 12px;
+
+  &-item, &-submenu-title {
+    border-radius: 10px !important;
+    margin: 4px 0 !important;
+    height: 48px !important;
+    line-height: 48px !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: v.$white !important;
+    }
+    .anticon {
+      font-size: 18px !important;
+    }
+  }
+
+  &-item-selected {
+    background: linear-gradient(135deg, v.$farm-accent 0%, color.adjust(v.$farm-accent, $lightness: -15%) 100%) !important;
+    color: v.$white !important;
+    box-shadow: 0 4px 15px rgba(244, 162, 97, 0.4);
+    &::after {
+      display: none;
+    }
+  }
+
+  &-sub {
+    .ant-menu-item, .ant-menu-submenu-title {
+      height: 42px !important;
+      line-height: 42px !important;
+      margin: 2px 0 !important;
+      padding-left: 24px !important;
+    }
+  }
+
+  &-submenu {
+    &-title {
+      border-radius: 10px !important;
+      margin: 4px 0 !important;
+      &:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+      }
+    }
+    &-arrow {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+  }
+
+  &-submenu-selected > .ant-menu-submenu-title {
+    color: v.$white !important;
+  }
+
+  &-inline &-sub {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}
+
+.ant-menu-item-group-title {
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1.5px !important;
+  padding: 16px 20px 8px !important;
+}
+
