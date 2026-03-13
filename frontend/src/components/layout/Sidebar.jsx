@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { UnorderedListOutlined, DashboardOutlined, ProductOutlined, SettingOutlined, LogoutOutlined, HomeOutlined, TeamOutlined, MedicineBoxOutlined, ShoppingCartOutlined, CarOutlined, ExperimentOutlined } from '@ant-design/icons';
+import { UnorderedListOutlined, HomeOutlined, ProfileOutlined, OrderedListOutlined, ProductOutlined, SettingOutlined, LogoutOutlined, TeamOutlined, MedicineBoxOutlined, ShoppingCartOutlined, FileDoneOutlined, ExperimentOutlined } from '@ant-design/icons';
 import { Menu, Button } from 'antd';
 
 const menuItems = [
@@ -9,9 +9,9 @@ const menuItems = [
     label: 'Chính',
     icon: <ProductOutlined />,
     children: [
-      { key: '/dashboard', label: 'Bảng tổng quát', icon: <DashboardOutlined /> },
-      { key: '/livestock', label: 'Vật nuôi', icon: <HomeOutlined /> },
-      { key: '/barns', label: 'Chuồng trại', icon: <ProductOutlined /> },
+      { key: '/dashboard', label: 'Bảng tổng quát', icon: <HomeOutlined /> },
+      { key: '/livestock', label: 'Danh sách vật nuôi', icon: <ProfileOutlined /> },
+      { key: '/barns', label: 'Danh sách chuồng trại', icon: <OrderedListOutlined /> },
     ],
   },
   {
@@ -20,7 +20,7 @@ const menuItems = [
     icon: <UnorderedListOutlined />,
     children: [
       { key: '/staff', label: 'Nhân sự trang trại', icon: <TeamOutlined /> },
-      { key: '/tasks', label: 'Công việc hằng ngày', icon: <CarOutlined /> },
+      { key: '/tasks', label: 'Công việc hằng ngày', icon: <FileDoneOutlined /> },
       { key: '/health', label: 'Y tế & Tiêm phòng', icon: <MedicineBoxOutlined /> },
       { key: '/feed', label: 'Kho thức ăn', icon: <ShoppingCartOutlined /> },
     ],
@@ -76,9 +76,7 @@ export const Sidebar = () => {
 
   return (
     <div className="sidebar">
-
-      {/* Header */}
-      <div className="sidebar__header">
+      <div className="sidebar__header" onClick={() => navigate('/dashboard')}>
         <div className="sidebar__logo-mark">🐄</div>
         <div className="sidebar__logo-text">
           <span className="sidebar__logo-title">FarmPro</span>

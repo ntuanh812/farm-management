@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
-export const VerifyOtpPage = () => {
+export const VerifyOtp = () => {
   const navigate = useNavigate();
 
   const onFinish = (values) => {

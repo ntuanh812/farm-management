@@ -9,6 +9,14 @@
     padding: 24px 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     margin-bottom: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    margin: 0 12px 16px;
+
+    &:active {
+      transform: translateY(0);
+    }
   }
 
   &__logo-mark {
@@ -159,11 +167,72 @@
   }
 }
 
-.ant-menu-item-group-title {
-  color: rgba(255, 255, 255, 0.5) !important;
-  font-size: 11px !important;
-  text-transform: uppercase !important;
-  letter-spacing: 1.5px !important;
-  padding: 16px 20px 8px !important;
+// HIERARCHY IMPROVEMENTS
+.ant-menu {
+  &-item {
+    // Level 1: Main items
+    font-weight: 600;
+    font-size: 15px;
+    padding-left: 20px !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.15) !important;
+      border-left: 3px solid v.$farm-accent !important;
+    }
+  }
+
+  &-submenu-title {
+    // Level 2: Submenu parents
+    font-weight: 500;
+    font-size: 14px;
+    padding-left: 28px !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-left: 3px solid v.$farm-primary !important;
+    }
+  }
+
+
+  &-sub {
+    .ant-menu-item {
+      // Level 3: Deep submenu items
+      font-weight: 400;
+      font-size: 13px;
+      opacity: 0.9;
+      padding-left: 52px !important;
+
+      &:hover {
+        opacity: 1;
+        background: rgba(255, 255, 255, 0.08) !important;
+        border-left: 2px solid v.$farm-success !important;
+      }
+    }
+  }
+
+  &-item-active {
+    border-left: 4px solid v.$farm-accent !important;
+  }
+
+  // Group titles clearer
+  &-item-group-title {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1.2px !important;
+    padding: 20px 24px 12px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    margin-top: 8px !important;
+  }
+}
+
+// Animation for smooth hierarchy reveal
+.ant-menu-submenu-arrow {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ant-menu-submenu-open > .ant-menu-submenu-title > .ant-menu-submenu-arrow {
+  transform: rotate(180deg);
 }
 

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { PageHeader } from "../../components/layout/PageHeader";
 import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, InputNumber, message } from "antd";
 
@@ -11,8 +13,6 @@ import {
   SearchOutlined,
   AppleOutlined,
   HomeOutlined,
-  MedicineBoxOutlined,
-  BarChartOutlined,
   AuditOutlined
 } from "@ant-design/icons";
 
@@ -185,10 +185,10 @@ const statsData = [
     trendUp: true
   },
   {
-    title: "Bò (Trâu)",
+    title: "Bò",
     value: 3,
     unit: "con",
-    icon: <AuditOutlined />,
+    icon: "🐮",
     type: "cattle",
     trend: "+1",
     trendUp: true
@@ -197,7 +197,7 @@ const statsData = [
     title: "Lợn",
     value: 3,
     unit: "con",
-    icon: <HomeOutlined />,
+    icon: "🐷",
     type: "pig",
     trend: "+1",
     trendUp: true
@@ -207,7 +207,7 @@ const statsData = [
     title: "Gia cầm",
     value: 4,
     unit: "con",
-    icon: <HomeOutlined />,
+    icon: "🐔",
     type: "poultry",
     trend: "+2",
     trendUp: true
@@ -248,8 +248,8 @@ const healthOptions = [
 export const Livestock = () => {
   const [data, setData] = useState(initialLivestockData);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
+
   const [form] = Form.useForm();
   const [searchText, setSearchText] = useState("");
 
@@ -383,10 +383,12 @@ export const Livestock = () => {
   ];
 
   // Handle actions
+  const navigate = useNavigate();
   const handleView = (record) => {
-    setSelectedRecord(record);
-    setIsViewModalOpen(true);
+    navigate(`/livestock/${record.id}`);
   };
+
+
 
   const handleEdit = (record) => {
     setSelectedRecord(record);
@@ -621,61 +623,8 @@ export const Livestock = () => {
         </Form>
       </Modal>
 
-      {/* View Modal */}
-      <Modal
-        title="Chi tiết vật nuôi"
-        open={isViewModalOpen}
-        onOk={() => setIsViewModalOpen(false)}
-        onCancel={() => setIsViewModalOpen(false)}
-        okText="Đóng"
-        cancelText={null}
-        width={500}
-      >
-        {selectedRecord && (
-          <div className="view-detail">
-            <div className="view-detail__row">
-              <span className="view-detail__label">Mã vật nuôi:</span>
-              <span className="view-detail__value">{selectedRecord.id}</span>
-            </div>
-            <div className="view-detail__row">
-              <span className="view-detail__label">Tên vật nuôi:</span>
-              <span className="view-detail__value">{selectedRecord.name}</span>
-            </div>
-            <div className="view-detail__row">
-              <span className="view-detail__label">Loại:</span>
-              <span className="view-detail__value">{selectedRecord.typeName}</span>
-            </div>
-            <div className="view-detail__row">
-              <span className="view-detail__label">Chuồng:</span>
-              <span className="view-detail__value">{selectedRecord.barnName}</span>
-            </div>
-            <div className="view-detail__row">
-              <span className="view-detail__label">Cân nặng:</span>
-              <span className="view-detail__value">{selectedRecord.weight} kg</span>
-            </div>
-            <div className="view-detail__row">
-              <span className="view-detail__label">Sản lượng:</span>
-              <span className="view-detail__value">
-                {selectedRecord.production ? 
-                  (["chicken", "duck"].includes(selectedRecord.type) ? `${selectedRecord.production} trứng/tuần` : `${selectedRecord.production} lít/ngày`)
-                  : "-"
-                }
-              </span>
-            </div>
-            <div className="view-detail__row">
-              <span className="view-detail__label">Sức khỏe:</span>
-              <Tag color={selectedRecord.health === "good" ? "success" : selectedRecord.health === "warning" ? "warning" : "error"}>
-                {selectedRecord.healthName}
-              </Tag>
-            </div>
-            <div className="view-detail__row">
-              <span className="view-detail__label">Ngày nhập:</span>
-              <span className="view-detail__value">{selectedRecord.entryDate}</span>
-            </div>
-          </div>
-        )}
-      </Modal>
     </div>
   );
 };
+
 

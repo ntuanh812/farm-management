@@ -9,7 +9,7 @@ import {
   DashboardOutlined,
   AppleOutlined,
   AuditOutlined,
-  RestOutlined
+  AndroidOutlined
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -20,7 +20,7 @@ export const DashBoard = () => {
       title: "Tổng vật nuôi",
       value: "1,245",
       unit: "con",
-      icon: <AppleOutlined />,
+      icon: <AndroidOutlined />,
       type: "livestock",
       trend: "+12%",
       trendUp: true
