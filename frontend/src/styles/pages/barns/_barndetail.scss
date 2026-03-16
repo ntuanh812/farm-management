@@ -1,0 +1,155 @@
+// Barn Detail Page Styles - Barn Blue Theme
+@use "sass:color";
+@use "../../base/variables" as *;
+@use "./variables" as *;
+
+.barn-detail {
+  padding: 24px 0;
+
+  .barn-detail__image-container {
+    position: relative;
+    aspect-ratio: 4/3;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 4px solid $barns-primary;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 
+      0 20px 60px rgba(74, 144, 226, 0.2),
+      inset 0 1px 0 rgba(255,255,255,0.5);
+
+    &:hover {
+      transform: translateY(-12px) scale(1.02);
+      border-color: #3b82f6;
+      box-shadow: 
+        0 40px 100px rgba(74, 144, 226, 0.4),
+        inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+
+    .ant-image img {
+      border-radius: 20px;
+    }
+  }
+
+  // Stats Override - Barn Colors
+  .ant-statistic {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important;
+    border: 2px solid #e0e7ff !important;
+    border-radius: 20px !important;
+    padding: 24px !important;
+    height: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(74, 144, 226, 0.25) !important;
+      border-color: $barns-primary !important;
+    }
+
+    &-title {
+      font-size: 13px !important;
+      font-weight: 700 !important;
+      color: #1e40af !important;
+      text-transform: uppercase !important;
+      letter-spacing: 1.2px !important;
+      margin-bottom: 8px !important;
+    }
+
+    &-content-value {
+      font-size: 2.2rem !important;
+      font-weight: 800 !important;
+      color: $barns-primary !important;
+      line-height: 1.1 !important;
+    }
+
+    &-content-suffix {
+      font-size: 14px !important;
+      color: #1d4ed8 !important;
+      font-weight: 600 !important;
+    }
+  }
+
+  // Descriptions Cards
+  .ant-descriptions {
+    .ant-descriptions-item {
+      margin-bottom: 16px !important;
+
+      &-label {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important;
+        border: 2px solid #e0e7ff !important;
+        border-radius: 16px !important;
+        padding: 14px 20px !important;
+        font-weight: 700 !important;
+        color: #1e40af !important;
+        font-size: 14px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        box-shadow: 0 4px 16px rgba(74, 144, 226, 0.15);
+      }
+
+      &-content {
+        background: linear-gradient(135deg, white 0%, #f8fafc 100%) !important;
+        border: 2px solid #eff6ff !important;
+        border-radius: 16px !important;
+        padding: 16px 24px !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        color: #1e293b !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+
+        &:hover {
+          border-color: $barns-primary !important;
+          transform: translateX(4px);
+          box-shadow: 0 12px 32px rgba(74, 144, 226, 0.2);
+        }
+      }
+    }
+  }
+
+  // Charts Glassmorphism Barn Blue
+  .ant-card {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(74, 144, 226, 0.2) !important;
+    border-radius: 24px !important;
+    box-shadow: 
+      0 20px 60px rgba(0,0,0,0.1),
+      inset 0 1px 0 rgba(255,255,255,0.6) !important;
+    overflow: hidden !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+
+    &:hover {
+      transform: translateY(-8px);
+      box-shadow: 
+        0 40px 100px rgba(0,0,0,0.15),
+        inset 0 1px 0 rgba(255,255,255,0.8) !important;
+      border-color: $barns-primary !important;
+    }
+
+    &-head {
+      background: linear-gradient(135deg, rgba(239, 246, 255, 0.9) 0%, rgba(219, 234, 254, 0.9) 100%) !important;
+      border: none !important;
+      border-radius: 24px 24px 0 0 !important;
+      padding: 24px 32px !important;
+      font-weight: 800 !important;
+      font-size: 20px !important;
+      color: #1e40af !important;
+      position: relative;
+
+      svg {
+        font-size: 24px !important;
+        margin-right: 16px !important;
+        color: $barns-primary !important;
+      }
+    }
+
+    &-body {
+      padding: 32px !important;
+      background: transparent !important;
+    }
+  }
+}

@@ -7,7 +7,8 @@ import { ForgotPassword } from "../pages/auth/ForgotPassword";
 import { ResetPassword } from "../pages/auth/ResetPassword";
 import { VerifyOtp } from "../pages/auth/VerifyOtp";
 import { LivestockDetail } from "../pages/livestock/LivestockDetail";
-
+import { Barns } from "../pages/barns/Barns";
+import { BarnDetail } from "../pages/barns/BarnDetail";
 
 export const AppRouter = () => {
     return(
@@ -22,6 +23,8 @@ export const AppRouter = () => {
                 <Route path="/dashboard" element={<DashBoard />} />
                 <Route path="/livestock" element={<Livestock />} />
                 <Route path="/livestock/:id" element={<LivestockDetail />} />
+                <Route path="/barns" element={<Barns />} />
+                <Route path="/barns/:id" element={<BarnDetail />} />
 
             </Route>
 

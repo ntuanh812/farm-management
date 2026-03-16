@@ -181,18 +181,6 @@ export const DashBoard = () => {
           </Col>
         </Row>
 
-        {/* Quick Actions */}
-        <div className="quick-actions">
-          <button className="action-btn action-btn--primary">
-            <span>➕</span> Thêm vật nuôi mới
-          </button>
-          <button className="action-btn action-btn--secondary">
-            <span>📝</span> Ghi nhận hoạt động
-          </button>
-          <button className="action-btn action-btn--secondary">
-            <span>📊</span> Xuất báo cáo
-          </button>
-        </div>
       </div>
     </div>
   );

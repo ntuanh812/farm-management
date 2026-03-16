@@ -73,8 +73,8 @@ export const LivestockDetail = () => {
               <Statistic
                 title="Cân nặng"
                 value={livestock.weight}
-                prefix="kg"
-                valueStyle={{ color: '#3f8600' }}
+                suffix=" kg"
+                valueStyle={{ color: '#059669', fontSize: '2.5rem', fontWeight: 800 }}
               />
             </Col>
             <Col span={8}>
