@@ -250,14 +250,6 @@ export const Barns = () => {
       sorter: (a, b) => a.occupancy - b.occupancy,
     },
     {
-      title: "Nhiệt độ",
-      dataIndex: "temperature",
-      key: "temperature",
-      width: 100,
-      sorter: (a, b) => a.temperature - b.temperature,
-      render: (temp) => `${temp}°C`
-    },
-    {
       title: "Độ sạch",
       dataIndex: "cleanlinessName",
       key: "cleanliness",
@@ -463,11 +455,6 @@ export const Barns = () => {
             <Col span={12}>
               <Form.Item name="currentCount" label="Hiện tại">
                 <InputNumber min={0} placeholder="Số vật nuôi hiện tại" style={{ width: "100%" }} />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="temperature" label="Nhiệt độ (°C)">
-                <InputNumber min={15} max={40} step={0.5} placeholder="Nhiệt độ" style={{ width: "100%" }} />
               </Form.Item>
             </Col>
           </Row>
