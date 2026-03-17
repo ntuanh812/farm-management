@@ -1,0 +1,1 @@
+- [x] 1. Edit Sidebar.jsx: Flatten menuItems thành top-level items (bỏ submenu cha, giữ children).\n- [x] 2. Test sidebar: Code clean, no syntax errors.

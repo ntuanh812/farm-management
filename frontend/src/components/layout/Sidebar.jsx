@@ -4,36 +4,15 @@ import { UnorderedListOutlined, HomeOutlined, ProfileOutlined, OrderedListOutlin
 import { Menu, Button } from 'antd';
 
 const menuItems = [
-  {
-    key: 'sub1',
-    label: 'Chính',
-    icon: <ProductOutlined />,
-    children: [
-      { key: '/dashboard', label: 'Bảng tổng quát', icon: <HomeOutlined /> },
-      { key: '/livestock', label: 'Danh sách vật nuôi', icon: <ProfileOutlined /> },
-      { key: '/barns', label: 'Danh sách chuồng trại', icon: <OrderedListOutlined /> },
-    ],
-  },
-  {
-    key: 'sub2',
-    label: 'Quản lý chuyên sâu',
-    icon: <UnorderedListOutlined />,
-    children: [
-      { key: '/staff', label: 'Nhân sự trang trại', icon: <TeamOutlined /> },
-      { key: '/tasks', label: 'Công việc hằng ngày', icon: <FileDoneOutlined /> },
-      { key: '/health', label: 'Y tế & Tiêm phòng', icon: <MedicineBoxOutlined /> },
-      { key: '/feed', label: 'Kho thức ăn', icon: <ShoppingCartOutlined /> },
-    ],
-  },
-  {
-    key: 'sub3',
-    label: 'Phân tích',
-    icon: <SettingOutlined />,
-    children: [
-      { key: '/reports', label: 'Báo cáo & Thống kê', icon: <ExperimentOutlined /> },
-      { key: '/settings', label: 'Cài đặt hệ thống', icon: <SettingOutlined /> },
-    ],
-  },
+  { key: '/dashboard', label: 'Bảng tổng quát', icon: <HomeOutlined /> },
+  { key: '/livestock', label: 'Danh sách vật nuôi', icon: <ProfileOutlined /> },
+  { key: '/barns', label: 'Danh sách chuồng trại', icon: <OrderedListOutlined /> },
+  { key: '/staff', label: 'Nhân sự trang trại', icon: <TeamOutlined /> },
+  { key: '/tasks', label: 'Công việc hằng ngày', icon: <FileDoneOutlined /> },
+  { key: '/health', label: 'Y tế & Tiêm phòng', icon: <MedicineBoxOutlined /> },
+  { key: '/feed', label: 'Kho thức ăn', icon: <ShoppingCartOutlined /> },
+  { key: '/reports', label: 'Báo cáo & Thống kê', icon: <ExperimentOutlined /> },
+  { key: '/settings', label: 'Cài đặt hệ thống', icon: <SettingOutlined /> },
 ];
 
 export const Sidebar = () => {
@@ -41,28 +20,7 @@ export const Sidebar = () => {
   const location = useLocation();
 
   // Find the currently selected key based on the current path
-  const getSelectedKey = () => {
-    const path = location.pathname;
-    if (path.startsWith('/livestock')) return '/livestock';
-    if (path.startsWith('/barns')) return '/barns';
-    if (path.startsWith('/staff')) return '/staff';
-    if (path.startsWith('/tasks')) return '/tasks';
-    if (path.startsWith('/health')) return '/health';
-    if (path.startsWith('/feed')) return '/feed';
-    if (path.startsWith('/reports')) return '/reports';
-    if (path.startsWith('/settings')) return '/settings';
-    return path;
-  };
-
-  // Get the default open keys
-  const getDefaultOpenKeys = () => {
-    const path = location.pathname;
-    if (path === '/dashboard' || path === '/') return ['sub1'];
-    if (path.startsWith('/livestock') || path.startsWith('/barns')) return ['sub1'];
-    if (path.startsWith('/staff') || path.startsWith('/tasks') || path.startsWith('/health') || path.startsWith('/feed')) return ['sub2'];
-    if (path.startsWith('/reports') || path.startsWith('/settings')) return ['sub3'];
-    return ['sub1'];
-  };
+  const getSelectedKey = () => location.pathname || '/dashboard';
 
   const onClick = (e) => {
     if (e.key) {
@@ -88,7 +46,6 @@ export const Sidebar = () => {
       <Menu
         onClick={onClick}
         style={{ width: 256 }}
-        defaultOpenKeys={getDefaultOpenKeys()}
         selectedKeys={[getSelectedKey()]}
         mode="inline"
         items={menuItems}
