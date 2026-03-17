@@ -1,39 +1,9 @@
-
 // Livestock Page Styles
 @use "sass:color";
 @use "../../base/variables" as *;
 @use "./variables" as *;
 
-// Mixins
-@mixin farm-card {
-  background: linear-gradient(145deg, #ffffff 0%, $farm-cream 100%);
-  border-radius: 16px;
-  border: 1px solid rgba(45, 90, 39, 0.1);
-  box-shadow: 
-    0 4px 20px rgba(45, 90, 39, 0.08),
-    0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 
-      0 8px 30px rgba(45, 90, 39, 0.15),
-      0 4px 12px rgba(0, 0, 0, 0.08);
-  }
-}
-
-@mixin stat-icon($color) {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  background: linear-gradient(135deg, $color 0%, color.adjust($color, $lightness: 10%) 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba($color, 0.4);
-}
+@use "../../components/ui/cards" as cards;
 
 .livestock {
   &__maincontent {
@@ -48,8 +18,8 @@
   }
 
   // Stat Card Styles
-  .stat-card {
-    @include farm-card;
+.stat-card {
+    @include cards.farm-card;
     padding: 20px;
     position: relative;
     overflow: hidden;
@@ -70,7 +40,7 @@
         background: linear-gradient(90deg, $farm-primary, $farm-secondary);
       }
       .stat-card__icon {
-        @include stat-icon($farm-primary);
+@include cards.stat-icon($farm-primary);
       }
     }
 
@@ -78,8 +48,8 @@
       &::before {
         background: linear-gradient(90deg, #5b7c99, #7a9ab8);
       }
-      .stat-card__icon {
-        @include stat-icon(#5b7c99);
+        .stat-card__icon {
+        @include cards.stat-icon(#5b7c99);
       }
     }
 
@@ -87,8 +57,8 @@
       &::before {
         background: linear-gradient(90deg, #d4a5a5, #e8c4c4);
       }
-      .stat-card__icon {
-        @include stat-icon(#d4a5a5);
+        .stat-card__icon {
+        @include cards.stat-icon(#d4a5a5);
       }
     }
 
@@ -96,8 +66,8 @@
       &::before {
         background: linear-gradient(90deg, #f0c674, #f5d89a);
       }
-      .stat-card__icon {
-        @include stat-icon(#f0c674);
+        .stat-card__icon {
+        @include cards.stat-icon(#f0c674);
       }
     }
 
@@ -156,7 +126,7 @@
 
   // Table Card
   .table-card {
-    @include farm-card;
+@include cards.farm-card;
     padding: 0;
 
     &__header {
