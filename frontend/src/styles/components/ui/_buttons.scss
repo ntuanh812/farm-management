@@ -1,0 +1,10 @@
+@use "../../base/variables" as *;
+.ant-btn-primary {
+  background: linear-gradient(135deg, $farm-primary 0%, $farm-secondary 100%);
+  border: none;
+  box-shadow: 0 4px 15px rgba(45, 90, 39, 0.3);
+
+  &:hover {
+    background: linear-gradient(135deg, $farm-secondary 0%, $farm-primary 100%);
+  }
+}

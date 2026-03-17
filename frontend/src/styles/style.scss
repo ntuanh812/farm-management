@@ -2,12 +2,13 @@
 @use "base";
 @use "base/variables" as v;
 @use "components/layout";
+@use "components/ui";
 @use "pages/dashboard";
 @use "pages/auth";
 @use "pages/livestock";
 @use "pages/barns";
 
-// Global styles that need variables
+
 :root {
   --farm-primary: #{v.$farm-primary};
   --farm-secondary: #{v.$farm-secondary};

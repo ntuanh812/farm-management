@@ -25,7 +25,6 @@ export const AppRouter = () => {
                 <Route path="/livestock/:id" element={<LivestockDetail />} />
                 <Route path="/barns" element={<Barns />} />
                 <Route path="/barns/:id" element={<BarnDetail />} />
-
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

@@ -281,13 +281,3 @@
   }
 }
 
-// Override Ant Design
-.ant-btn-primary {
-  background: linear-gradient(135deg, $barns-primary 0%, $barns-secondary 100%);
-  border: none;
-  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
-
-  &:hover {
-    background: linear-gradient(135deg, $barns-secondary 0%, $barns-primary 100%);
-  }
-}
