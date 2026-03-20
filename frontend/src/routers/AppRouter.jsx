@@ -9,6 +9,8 @@ import { VerifyOtp } from "../pages/auth/VerifyOtp";
 import { LivestockDetail } from "../pages/livestock/LivestockDetail";
 import { Barns } from "../pages/barns/Barns";
 import { BarnDetail } from "../pages/barns/BarnDetail";
+import { Staff } from "../pages/staff/Staff";
+import { StaffDetail } from "../pages/staff/StaffDetail";
 
 export const AppRouter = () => {
     return(
@@ -25,6 +27,8 @@ export const AppRouter = () => {
                 <Route path="/livestock/:id" element={<LivestockDetail />} />
                 <Route path="/barns" element={<Barns />} />
                 <Route path="/barns/:id" element={<BarnDetail />} />
+                <Route path="/staff" element={<Staff />} />
+                <Route path="/staff/:id" element={<StaffDetail />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />
