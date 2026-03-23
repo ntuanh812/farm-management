@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import dayjs from "dayjs";
 import { PageHeader } from "../../components/layout/PageHeader";
 import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, InputNumber, DatePicker, Progress, message } from "antd";
 
@@ -332,14 +332,15 @@ export const Tasks = () => {
 // Removed unused navigate
 
   const handleEdit = (record) => {
+    console.log('Edit clicked:', record);
     setSelectedRecord(record);
-    form.setFieldsValue({
-      ...record,
-      barn: record.barn,
+    form.setFieldsValue({  
+      ...record,  
+      barn: record.barn,  
       assignee: record.assignee,
+      dueDate: dayjs(record.dueDate)
     });
-    setIsModalOpen(true);
-  };
+    setIsModalOpen(true);};
 
   const handleDelete = (record) => {
     Modal.confirm({
@@ -362,13 +363,19 @@ export const Tasks = () => {
 
   const handleModalOk = () => {
     form.validateFields().then(values => {
+      const formattedValues = {
+        ...values,
+        dueDate: values.dueDate
+        ? values.dueDate.format("YYYY-MM-DD")
+        : null
+      };
       if (selectedRecord) {
         // Update
         setData(data.map(item => 
           item.key === selectedRecord.key 
             ? { 
                 ...item, 
-                ...values, 
+                ...formattedValues, 
                 categoryName: categoryOptions.find(c => c.value === values.category)?.label || values.categoryName,
                 assigneeName: staffOptions.find(s => s.value === values.assignee)?.label || values.assigneeName,
                 barnName: barnOptions.find(b => b.value === values.barn)?.label || values.barnName,
@@ -400,7 +407,7 @@ export const Tasks = () => {
   };
 
   return (
-    <div className="daily-tasks">
+    <div className="tasks">
       <PageHeader
         title="Công việc hàng ngày"
         subtitle="Quản lý nhiệm vụ và tiến độ công việc trong trang trại"
@@ -411,9 +418,9 @@ export const Tasks = () => {
         }
       />
 
-      <div className="daily-tasks__content">
+      <div className="tasks__content">
         {/* Stats Grid - matching pattern */}
-        <Row gutter={[20, 20]} className="daily-tasks-stats">
+        <Row gutter={[20, 20]} className="tasks-stats">
           {statsData.map((stat, index) => (
             <Col xs={24} sm={12} lg={6} key={index}>
               <Card className={`stat-card stat-card--${stat.type}`}>
@@ -456,7 +463,7 @@ export const Tasks = () => {
               showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} công việc`,
             }}
             scroll={{ x: 1600 }}
-            className="daily-tasks-table"
+            className="tasks-table"
           />
         </Card>
       </div>
@@ -474,7 +481,7 @@ export const Tasks = () => {
         <Form
           form={form}
           layout="vertical"
-          className="daily-tasks-form"
+          className="tasks-form"
         >
           <Form.Item name="title" label="Tiêu đề công việc" rules={[{ required: true, message: "Vui lòng nhập tiêu đề!" }]}>
             <Input placeholder="Nhập tiêu đề công việc" />
