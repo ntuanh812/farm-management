@@ -1,9 +1,9 @@
 import { PageHeader } from "../../components/layout/PageHeader";
-import { Card, Row, Col, Typography, List, Statistic } from "antd";
+import { Card, Row, Col, Typography, List } from "antd";
 import {
   RiseOutlined,
   FallOutlined,
-  MedicineBoxOutlined,
+  SnippetsOutlined,
   HomeOutlined,
   TeamOutlined,
   DashboardOutlined,
@@ -44,11 +44,11 @@ export const DashBoard = () => {
       trendUp: true
     },
     {
-      title: "Lịch tiêm hôm nay",
+      title: "Công việc đang chờ",
       value: "7",
-      unit: "lịch hẹn",
-      icon: <MedicineBoxOutlined />,
-      type: "vaccine",
+      unit: "công việc",
+      icon: <SnippetsOutlined />,
+      type: "daily-tasks",
       trend: "-2",
       trendUp: false
     }
@@ -83,8 +83,8 @@ export const DashBoard = () => {
         return <AuditOutlined />;
       case "feed":
         return <AppleOutlined />;
-      case "vaccine":
-        return <MedicineBoxOutlined />;
+      case "daily-tasks":
+        return <SnippetsOutlined />;
       default:
         return <DashboardOutlined />;
     }

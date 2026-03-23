@@ -92,7 +92,7 @@
       }
     }
 
-    &--vaccine {
+    &--daily-tasks {
       .stat-card__icon {
         @include farm-stat-icon($farm-danger);
       }
