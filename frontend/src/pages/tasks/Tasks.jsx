@@ -21,7 +21,7 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 // Mock data for daily tasks - consistent với Livestock/Barns/Staff pattern
-const initialDailyTasksData = [
+const initialTasksData = [
   {
     key: "1",
     id: "TK001",
@@ -196,8 +196,8 @@ const barnOptions = [
   { value: "all", label: "Tất cả" }
 ];
 
-export const DailyTasks = () => {
-  const [data, setData] = useState(initialDailyTasksData);
+export const Tasks = () => {
+  const [data, setData] = useState(initialTasksData);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [form] = Form.useForm();

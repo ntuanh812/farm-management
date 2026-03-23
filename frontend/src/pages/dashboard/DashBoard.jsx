@@ -44,7 +44,7 @@ export const DashBoard = () => {
       trendUp: true
     },
     {
-      title: "Công việc đang chờ",
+      title: "Công việc trang trại",
       value: "7",
       unit: "công việc",
       icon: <SnippetsOutlined />,

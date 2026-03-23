@@ -8,7 +8,7 @@ const menuItems = [
   { key: '/livestock', label: 'Danh sách vật nuôi', icon: <ProfileOutlined /> },
   { key: '/barns', label: 'Danh sách chuồng trại', icon: <OrderedListOutlined /> },
   { key: '/staff', label: 'Nhân sự trang trại', icon: <TeamOutlined /> },
-  { key: '/daily-tasks', label: 'Công việc hằng ngày', icon: <FileDoneOutlined /> },
+  { key: '/tasks', label: 'Công việc đang giao', icon: <FileDoneOutlined /> },
   { key: '/feed', label: 'Kho thức ăn', icon: <ShoppingCartOutlined /> },
   { key: '/reports', label: 'Báo cáo & Thống kê', icon: <ExperimentOutlined /> },
   { key: '/settings', label: 'Cài đặt hệ thống', icon: <SettingOutlined /> },

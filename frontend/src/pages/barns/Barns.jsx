@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { PageHeader } from "../../components/layout/PageHeader";
 import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, InputNumber, message } from "antd";
 
@@ -30,9 +29,7 @@ const initialBarnsData = [
     cleanliness: "good",
     cleanlinessName: "Sạch sẽ",
     temperature: 28,
-    livestockCount: 20,
-    status: "active"
-  },
+    status: "active"},
   {
     key: "2",
     id: "A2", 
@@ -45,7 +42,6 @@ const initialBarnsData = [
     cleanliness: "good",
     cleanlinessName: "Sạch sẽ",
     temperature: 27,
-    livestockCount: 15,
     status: "active"
   },
   {
@@ -60,13 +56,12 @@ const initialBarnsData = [
     cleanliness: "warning",
     cleanlinessName: "Cần vệ sinh",
     temperature: 26,
-    livestockCount: 45,
     status: "active"
   },
   {
     key: "4",
     id: "B2",
-    name: "Chuồng B2", 
+    name: "Chuồng B2",
     type: "pig",
     typeName: "Lợn thịt",
     capacity: 120,
@@ -75,7 +70,6 @@ const initialBarnsData = [
     cleanliness: "good",
     cleanlinessName: "Sạch sẽ",
     temperature: 25,
-    livestockCount: 80,
     status: "active"
   },
   {
@@ -90,7 +84,6 @@ const initialBarnsData = [
     cleanliness: "good",
     cleanlinessName: "Sạch sẽ", 
     temperature: 30,
-    livestockCount: 3200,
     status: "active"
   },
   {
@@ -105,9 +98,7 @@ const initialBarnsData = [
     cleanliness: "good",
     cleanlinessName: "Sạch sẽ",
     temperature: 29,
-    livestockCount: 2800,
-    status: "active"
-  },
+    status: "active"},
   {
     key: "7",
     id: "D1",
@@ -119,9 +110,7 @@ const initialBarnsData = [
     occupancy: 40,
     cleanliness: "good",
     cleanlinessName: "Sạch sẽ",
-    temperature: 28,
-    livestockCount: 12,
-    status: "active"
+    temperature: 28,status: "active"
   },
   {
     key: "8",
@@ -135,7 +124,6 @@ const initialBarnsData = [
     cleanliness: "critical",
     cleanlinessName: "Bẩn, cần xử lý",
     temperature: 27,
-    livestockCount: 65,
     status: "maintenance"
   }
 ];
@@ -262,13 +250,6 @@ export const Barns = () => {
       },
       filters: cleanlinessOptions,
       onFilter: (value, record) => record.cleanliness === value,
-    },
-    {
-      title: "Số vật nuôi",
-      dataIndex: "livestockCount",
-      key: "livestockCount",
-      width: 120,
-      sorter: (a, b) => a.livestockCount - b.livestockCount,
     },
     {
       title: "Thao tác",
@@ -431,9 +412,18 @@ export const Barns = () => {
         width={600}
       >
         <Form form={form} layout="vertical" className="barns-form">
-          <Form.Item name="name" label="Tên chuồng" rules={[{ required: true }]}>
-            <Input placeholder="Nhập tên chuồng" />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="id" label="Mã chuồng" rules={[{ required: true }]}>
+                <Input placeholder="Nhập mã chuồng" disabled={!!selectedRecord} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="name" label="Tên chuồng" rules={[{ required: true }]}>
+                <Input placeholder="Nhập tên chuồng" />
+              </Form.Item>
+            </Col>
+          </Row>
 
           <Row gutter={16}>
             <Col span={12}>
@@ -458,9 +448,6 @@ export const Barns = () => {
                 <InputNumber min={0} placeholder="Số vật nuôi hiện tại" style={{ width: "100%" }} />
               </Form.Item>
             </Col>
-          </Row>
-
-          <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="cleanliness" label="Độ sạch">
                 <Select placeholder="Chọn độ sạch">
@@ -468,11 +455,6 @@ export const Barns = () => {
                     <Option key={option.value} value={option.value}>{option.label}</Option>
                   ))}
                 </Select>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="livestockCount" label="Số vật nuôi">
-                <InputNumber min={0} placeholder="Tổng vật nuôi" style={{ width: "100%" }} />
               </Form.Item>
             </Col>
           </Row>

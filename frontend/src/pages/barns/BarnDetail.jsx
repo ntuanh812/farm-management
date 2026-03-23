@@ -7,9 +7,9 @@ import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, Cartesia
 
 // Mock barn data
 const FAKE_BARNS_DATA = [
-  {id: "A1", name: "Chuồng A1", type: "cattle", typeName: "Bò sữa", capacity: 50, currentCount: 20, occupancy: 40, cleanliness: "good", cleanlinessName: "Sạch sẽ", temperature: 28, livestockCount: 20, builtDate: "2023-01-15", size: "500m²", ventilation: "Tốt", location: "Khu A"},
-  {id: "B2", name: "Chuồng B2", type: "pig", typeName: "Lợn thịt", capacity: 120, currentCount: 80, occupancy: 67, cleanliness: "good", cleanlinessName: "Sạch sẽ", temperature: 25, livestockCount: 80, builtDate: "2023-06-20", size: "800m²", ventilation: "Tốt", location: "Khu B"},
-  {id: "C1", name: "Chuồng C1", type: "broiler", typeName: "Gà thịt", capacity: 5000, currentCount: 3200, occupancy: 64, cleanliness: "warning", cleanlinessName: "Cần vệ sinh", temperature: 30, livestockCount: 3200, builtDate: "2024-01-10", size: "2000m²", ventilation: "Tự động", location: "Khu C"}
+{id: "A1", name: "Chuồng A1", type: "cattle", typeName: "Bò sữa", capacity: 50, currentCount: 20, occupancy: 40, cleanliness: "good", cleanlinessName: "Sạch sẽ", temperature: 28, builtDate: "2023-01-15", size: "500m²", ventilation: "Tốt", location: "Khu A"},
+  {id: "B2", name: "Chuồng B2", type: "pig", typeName: "Lợn thịt", capacity: 120, currentCount: 80, occupancy: 67, cleanliness: "good", cleanlinessName: "Sạch sẽ", temperature: 25, builtDate: "2023-06-20", size: "800m²", ventilation: "Tốt", location: "Khu B"},
+  {id: "C1", name: "Chuồng C1", type: "broiler", typeName: "Gà thịt", capacity: 5000, currentCount: 3200, occupancy: 64, cleanliness: "warning", cleanlinessName: "Cần vệ sinh", temperature: 30, builtDate: "2024-01-10", size: "2000m²", ventilation: "Tự động", location: "Khu C"}
 ];
 
 // Mock assigned livestock for demo
@@ -95,13 +95,13 @@ export const BarnDetail = () => {
                 valueStyle={{ color: '#059669', fontSize: '2.5rem' }}
               />
             </Col>
-            <Col span={8}>
-              <Statistic
-                title="Số vật nuôi"
-                value={barn.livestockCount}
-                suffix=" con"
-                valueStyle={{ color: '#3B82F6', fontSize: '2.5rem' }}
-              />
+            <Col span={8}>            
+              <Statistic   
+                title="Số vật nuôi"           
+                value={barn.currentCount}           
+                suffix=" con"         
+                valueStyle={{ color: '#3B82F6', fontSize: '2.5rem' }}        
+                />      
             </Col>
             <Col span={8}>
               <Statistic title="Nhiệt độ">

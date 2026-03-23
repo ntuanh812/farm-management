@@ -11,7 +11,7 @@ import { Barns } from "../pages/barns/Barns";
 import { BarnDetail } from "../pages/barns/BarnDetail";
 import { Staff } from "../pages/staff/Staff";
 import { StaffDetail } from "../pages/staff/StaffDetail";
-import { DailyTasks } from "../pages/daily-tasks/DailyTasks";
+import { Tasks } from "../pages/tasks/Tasks";
 
 export const AppRouter = () => {
     return(
@@ -30,7 +30,7 @@ export const AppRouter = () => {
                 <Route path="/barns/:id" element={<BarnDetail />} />
                 <Route path="/staff" element={<Staff />} />
                 <Route path="/staff/:id" element={<StaffDetail />} />
-                <Route path="/daily-tasks" element={<DailyTasks />} />
+                <Route path="/tasks" element={<Tasks />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />
