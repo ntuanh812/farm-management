@@ -12,8 +12,8 @@ import {
   SearchOutlined,
   TeamOutlined,
   UserOutlined,
-  MoneyCollectOutlined,
-  PhoneOutlined
+  FallOutlined,
+  RiseOutlined
 } from "@ant-design/icons";
 
 const { Option } = Select;
@@ -418,6 +418,7 @@ export const Staff = () => {
                   <span className="stat-card__label"> {stat.unit}</span>
                 </div>
                 <div className={`stat-card__trend ${stat.trendUp ? 'stat-card__trend--up' : 'stat-card__trend--down'}`}>
+                  {stat.trendUp ? <RiseOutlined /> : <FallOutlined />}
                   <span>{stat.trend} so với tháng trước</span>
                 </div>
               </Card>

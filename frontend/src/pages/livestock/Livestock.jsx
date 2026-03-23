@@ -6,14 +6,13 @@ import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input,
 
 import {
   PlusOutlined,
-  MinusOutlined,
   EditOutlined,
   DeleteOutlined,
   EyeOutlined,
   SearchOutlined,
   AppleOutlined,
-  HomeOutlined,
-  AuditOutlined
+  RiseOutlined,
+  FallOutlined
 } from "@ant-design/icons";
 
 
@@ -181,7 +180,7 @@ const statsData = [
     unit: "con",
     icon: <AppleOutlined />,
     type: "livestock",
-    trend: "+2",
+    trend: "2",
     trendUp: true
   },
   {
@@ -190,7 +189,7 @@ const statsData = [
     unit: "con",
     icon: "🐮",
     type: "cattle",
-    trend: "+1",
+    trend: "1",
     trendUp: true
   },
   {
@@ -199,7 +198,7 @@ const statsData = [
     unit: "con",
     icon: "🐷",
     type: "pig",
-    trend: "+1",
+    trend: "1",
     trendUp: true
   },
 
@@ -209,7 +208,7 @@ const statsData = [
     unit: "con",
     icon: "🐔",
     type: "poultry",
-    trend: "+2",
+    trend: "2",
     trendUp: true
   }
 ];
@@ -482,7 +481,7 @@ export const Livestock = () => {
                   <span className="stat-card__label"> {stat.unit}</span>
                 </div>
                 <div className={`stat-card__trend ${stat.trendUp ? 'stat-card__trend--up' : 'stat-card__trend--down'}`}>
-                  {stat.trendUp ? <PlusOutlined /> : <MinusOutlined />}
+                  {stat.trendUp ? <RiseOutlined /> : <FallOutlined />}
                   <span>{stat.trend} so với tháng trước</span>
                 </div>
               </Card>

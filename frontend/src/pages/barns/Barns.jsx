@@ -6,7 +6,8 @@ import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input,
 
 import {
   PlusOutlined,
-  MinusOutlined,
+  FallOutlined,
+  RiseOutlined,
   EditOutlined,
   DeleteOutlined,
   EyeOutlined,
@@ -147,7 +148,7 @@ const statsData = [
     unit: "chuồng",
     icon: <HomeOutlined />,
     type: "total",
-    trend: "+1",
+    trend: "1",
     trendUp: true
   },
   {
@@ -156,7 +157,7 @@ const statsData = [
     unit: "%",
     icon: "📊",
     type: "occupancy",
-    trend: "+3%",
+    trend: "3%",
     trendUp: true
   },
   {
@@ -165,7 +166,7 @@ const statsData = [
     unit: "chuồng",
     icon: "🟢",
     type: "empty", 
-    trend: "-1",
+    trend: "1",
     trendUp: false
   },
   {
@@ -174,7 +175,7 @@ const statsData = [
     unit: "/100",
     icon: "🧼",
     type: "cleanliness",
-    trend: "+5",
+    trend: "5",
     trendUp: true
   }
 ];
@@ -384,7 +385,7 @@ export const Barns = () => {
                   <span className="stat-card__label"> {stat.unit}</span>
                 </div>
                 <div className={`stat-card__trend ${stat.trendUp ? 'stat-card__trend--up' : 'stat-card__trend--down'}`}>
-                  {stat.trendUp ? <PlusOutlined /> : <MinusOutlined />}
+                  {stat.trendUp ? <RiseOutlined /> : <FallOutlined />}
                   <span>{stat.trend} so với tháng trước</span>
                 </div>
               </Card>
