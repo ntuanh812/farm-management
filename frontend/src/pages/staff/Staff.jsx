@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageHeader } from "../../components/layout/PageHeader";
 import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, InputNumber, message, DatePicker } from "antd";
-import { initialStaffData, roleOptions, statusOptions } from "../../data/mockData";
+import { initialStaffData } from "../../data/mockData";
 import {
   PlusOutlined,
   EditOutlined,
@@ -59,6 +59,18 @@ const statsData = [
     trend: "+1",
     trendUp: true
   }
+];
+const roleOptions = [
+  { value: "veterinarian", label: "Thú y" },
+  { value: "cleaner", label: "Vệ sinh" },
+  { value: "livestock", label: "Chăn nuôi" }
+];
+
+// Status options
+const statusOptions = [
+  { value: "active", label: "Đang làm", color: "success" },
+  { value: "leave", label: "Nghỉ phép", color: "warning" },
+  { value: "trial", label: "Thử việc", color: "blue" }
 ];
 
 

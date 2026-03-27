@@ -88,17 +88,6 @@ export const initialBarnsData = [
     }
 ];
 
-export const barnTypeOptions = [
-  { value: "poultry", label: "Gia cầm" },
-  { value: "cattle", label: "Gia súc" }
-];
-
-export const cleanlinessOptions = [
-  { value: "good", label: "Sạch sẽ", color: "success" },
-  { value: "warning", label: "Cần vệ sinh", color: "warning" },
-  { value: "critical", label: "Bẩn, cần xử lý", color: "error" }
-];
-
 //feedstorage
 export const initialFeedData = [
   {
@@ -222,31 +211,6 @@ export const initialLivestockData = [
   },
 ];
 
-export const barnOptions = [
-  { value: "A1", label: "Chuồng A1" },
-  { value: "A2", label: "Chuồng A2" },
-  { value: "B1", label: "Chuồng B1" },
-  { value: "B2", label: "Chuồng B2" },
-  { value: "B3", label: "Chuồng B3" },
-  { value: "C1", label: "Chuồng C1" },
-  { value: "C2", label: "Chuồng C2" },
-  { value: "C3", label: "Chuồng C3" },
-  { value: "D1", label: "Chuồng D1" },
-];
-
-// Livestock type options
-export const typeOptions = [
-  { value: "poultry", label: "Gia cầm" },
-  { value: "cattle", label: "Gia súc" },
-];
-
-
-export const healthOptions = [
-  { value: "good", label: "Khỏe mạnh", color: "success" },
-  { value: "warning", label: "Theo dõi", color: "warning" },
-  { value: "critical", label: "Nghi ngờ", color: "error" },
-];
-
 //staff
 export const initialStaffData = [
   {
@@ -279,17 +243,4 @@ export const initialStaffData = [
     hireDate: "2024-01-10",
     status: "active"
   },
-];
-
-export const roleOptions = [
-  { value: "veterinarian", label: "Thú y" },
-  { value: "cleaner", label: "Vệ sinh" },
-  { value: "livestock", label: "Chăn nuôi" }
-];
-
-// Status options
-export const statusOptions = [
-  { value: "active", label: "Đang làm", color: "success" },
-  { value: "leave", label: "Nghỉ phép", color: "warning" },
-  { value: "trial", label: "Thử việc", color: "blue" }
 ];

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageHeader } from "../../components/layout/PageHeader";
 import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, InputNumber, message } from "antd";
-import { initialBarnsData, barnTypeOptions, cleanlinessOptions } from "../../data/mockData";
+import { initialBarnsData } from "../../data/mockData";
 import {
   PlusOutlined,
   FallOutlined,
@@ -56,6 +56,16 @@ const statsData = [
     trend: "5",
     trendUp: true
   }
+];
+const barnTypeOptions = [
+  { value: "poultry", label: "Gia cầm" },
+  { value: "cattle", label: "Gia súc" }
+];
+
+const cleanlinessOptions = [
+  { value: "good", label: "Sạch sẽ", color: "success" },
+  { value: "warning", label: "Cần vệ sinh", color: "warning" },
+  { value: "critical", label: "Bẩn, cần xử lý", color: "error" }
 ];
 
 

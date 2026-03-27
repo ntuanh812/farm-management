@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageHeader } from "../../components/layout/PageHeader";
 import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, InputNumber, message } from "antd";
-import { initialLivestockData, barnOptions, typeOptions, healthOptions } from "../../data/mockData";
+import { initialLivestockData } from "../../data/mockData";
 import {
   PlusOutlined,
   EditOutlined,
@@ -56,6 +56,30 @@ const statsData = [
     trend: "2",
     trendUp: true
   }
+];
+const barnOptions = [
+  { value: "A1", label: "Chuồng A1" },
+  { value: "A2", label: "Chuồng A2" },
+  { value: "B1", label: "Chuồng B1" },
+  { value: "B2", label: "Chuồng B2" },
+  { value: "B3", label: "Chuồng B3" },
+  { value: "C1", label: "Chuồng C1" },
+  { value: "C2", label: "Chuồng C2" },
+  { value: "C3", label: "Chuồng C3" },
+  { value: "D1", label: "Chuồng D1" },
+];
+
+// Livestock type options
+const typeOptions = [
+  { value: "poultry", label: "Gia cầm" },
+  { value: "cattle", label: "Gia súc" },
+];
+
+
+const healthOptions = [
+  { value: "good", label: "Khỏe mạnh", color: "success" },
+  { value: "warning", label: "Theo dõi", color: "warning" },
+  { value: "critical", label: "Nghi ngờ", color: "error" },
 ];
 
 
