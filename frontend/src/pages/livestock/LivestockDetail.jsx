@@ -59,7 +59,6 @@ export const LivestockDetail = () => {
             <Descriptions column={1} size="small">
               <Descriptions.Item label="Mã ID">{livestock.id}</Descriptions.Item>
               <Descriptions.Item label="Giống">{livestock.breed || 'N/A'}</Descriptions.Item>
-              <Descriptions.Item label="Giới tính">{livestock.gender === 'female' ? '🐄' : '🐃'}</Descriptions.Item>
               <Descriptions.Item label="Tuổi">{livestock.age || 'N/A'} tháng</Descriptions.Item>
               <Descriptions.Item label="Thức ăn/ngày">{livestock.dailyFeed || 25} kg</Descriptions.Item>
               <Descriptions.Item label="Vắc xin gần nhất">2024-07-01</Descriptions.Item>
