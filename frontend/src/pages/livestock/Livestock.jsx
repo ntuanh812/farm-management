@@ -24,11 +24,8 @@ import {
   EditOutlined,
   DeleteOutlined,
   EyeOutlined,
-  HomeOutlined,
   RiseOutlined,
   FallOutlined,
-  UserOutlined,
-  PushpinOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 
@@ -86,10 +83,6 @@ export const Livestock = () => {
     []
   );
 
-  // ========================
-  // Stats tính từ data
-  // ========================
-
   const statsData = useMemo(() => {
     const total = data.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
@@ -111,8 +104,8 @@ export const Livestock = () => {
         title: "Tổng vật nuôi",
         value: total,
         unit: "con",
-        icon: <UserOutlined />,
-        type: "livestock",
+        icon: "🐾",
+        type: "poultry",
         trend: "+2",
         trendUp: true,
       },
@@ -120,8 +113,8 @@ export const Livestock = () => {
         title: "Vật nuôi khỏe",
         value: total ? Math.round((healthy / data.length) * 100) : 0,
         unit: "%",
-        icon: <RiseOutlined />,
-        type: "livestock",
+        icon: "❤️",
+        type: "cattle",
         trend: "+3%",
         trendUp: true,
       },
@@ -129,7 +122,7 @@ export const Livestock = () => {
         title: "Gia súc",
         value: livestock,
         unit: "con",
-        icon: <HomeOutlined />,
+        icon: "🐄",
         type: "livestock",
         trend: "+5",
         trendUp: true,
@@ -138,27 +131,19 @@ export const Livestock = () => {
         title: "Gia cầm",
         value: poultry,
         unit: "con",
-        icon: <PushpinOutlined />,
-        type: "poultry",
+        icon: "🐔",
+        type: "pig",
         trend: "-1",
         trendUp: false,
       },
     ];
   }, [data]);
 
-  // ========================
-  // Filter search
-  // ========================
-
   const filteredData = data.filter(
     (item) =>
       item.name?.toLowerCase().includes(searchText.toLowerCase()) ||
       item.tagCode?.toLowerCase().includes(searchText.toLowerCase())
   );
-
-  // ========================
-  // Table columns
-  // ========================
 
   const columns = [
     {

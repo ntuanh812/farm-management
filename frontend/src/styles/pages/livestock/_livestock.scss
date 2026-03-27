@@ -40,7 +40,7 @@
         background: linear-gradient(90deg, $farm-primary, $farm-secondary);
       }
       .stat-card__icon {
-@include cards.stat-icon($farm-primary);
+      @include cards.stat-icon($farm-primary);
       }
     }
 
