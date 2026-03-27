@@ -28,8 +28,7 @@ const initialBarnsData = [
     occupancy: 40,
     cleanliness: "good",
     cleanlinessName: "Sạch sẽ",
-    temperature: 28,
-    status: "active"},
+    status: "active" },
   {
     key: "2",
     id: "A2", 
@@ -41,9 +40,7 @@ const initialBarnsData = [
     occupancy: 38,
     cleanliness: "good",
     cleanlinessName: "Sạch sẽ",
-    temperature: 27,
-    status: "active"
-  },
+    status: "active" },
   {
     key: "3",
     id: "B1",
@@ -55,9 +52,7 @@ const initialBarnsData = [
     occupancy: 45,
     cleanliness: "warning",
     cleanlinessName: "Cần vệ sinh",
-    temperature: 26,
-    status: "active"
-  },
+    status: "active"},
   {
     key: "4",
     id: "B2",
@@ -69,9 +64,7 @@ const initialBarnsData = [
     occupancy: 67,
     cleanliness: "good",
     cleanlinessName: "Sạch sẽ",
-    temperature: 25,
-    status: "active"
-  },
+    status: "active"},
   {
     key: "5",
     id: "C1",
@@ -83,9 +76,7 @@ const initialBarnsData = [
     occupancy: 64,
     cleanliness: "good",
     cleanlinessName: "Sạch sẽ", 
-    temperature: 30,
-    status: "active"
-  },
+    status: "active" },
   {
     key: "6",
     id: "C2",
@@ -97,8 +88,8 @@ const initialBarnsData = [
     occupancy: 70,
     cleanliness: "good",
     cleanlinessName: "Sạch sẽ",
-    temperature: 29,
-    status: "active"},
+    status: "active" 
+  },
   {
     key: "7",
     id: "D1",
@@ -110,8 +101,7 @@ const initialBarnsData = [
     occupancy: 40,
     cleanliness: "good",
     cleanlinessName: "Sạch sẽ",
-    temperature: 28,status: "active"
-  },
+    status: "active"},
   {
     key: "8",
     id: "B3",
@@ -123,10 +113,7 @@ const initialBarnsData = [
     occupancy: 65,
     cleanliness: "critical",
     cleanlinessName: "Bẩn, cần xử lý",
-    temperature: 27,
-    status: "maintenance"
-  }
-];
+    status: "maintenance" }];
 
 // Thống kê
 const statsData = [

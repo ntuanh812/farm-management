@@ -16,7 +16,7 @@ const FAKE_FEED_ITEM = {
   supplier: "NCC001",
   supplierName: "Công ty Thức ăn A",
   room: "P1",
-  roomName: "Phòng 1 (Cám)",
+  roomName: "Phòng 1",
   batch: "240901",
   productionDate: "2024-09-01",
   usedPerDay: 45,
@@ -137,9 +137,9 @@ export const FeedStorageDetail = () => {
         </Col>
       </Row>
 
-      <Row gutter={24} style={{ marginTop: 24 }}>
+      <Row gutter={[12, 24]} style={{ marginTop: 12 }}>
         <Col span={12}>
-          <Card title={<span><LineChartOutlined /> Tiêu thụ theo ngày</span>}>
+          <Card title={<span><LineChartOutlined /> Tiêu thụ theo ngày</span>} style={{ marginBottom: 24 }}>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
