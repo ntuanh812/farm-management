@@ -11,6 +11,7 @@ import {
   AuditOutlined,
   AndroidOutlined
 } from "@ant-design/icons";
+import { activities } from "../../data/mockData";
 
 const { Title, Text } = Typography;
 
@@ -54,28 +55,6 @@ export const DashBoard = () => {
     }
   ];
 
-  const activities = [
-    {
-      icon: "health",
-      content: "Nhân viên A cập nhật sức khỏe cho bò #123",
-      time: "5 phút trước"
-    },
-    {
-      icon: "feed",
-      content: "Đã ghi nhận cho ăn chuồng B5",
-      time: "15 phút trước"
-    },
-    {
-      icon: "vaccine",
-      content: "Tiêm vaccine Lở mồm long móng cho đàn lợn khu C",
-      time: "1 giờ trước"
-    },
-    {
-      icon: "health",
-      content: "Kiểm tra sức khỏe đàn gà sinh sản",
-      time: "2 giờ trước"
-    }
-  ];
 
   const getActivityIcon = (type) => {
     switch (type) {

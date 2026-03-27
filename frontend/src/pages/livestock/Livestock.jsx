@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { PageHeader } from "../../components/layout/PageHeader";
 import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, InputNumber, message } from "antd";
-
+import { initialLivestockData, barnOptions, typeOptions, healthOptions } from "../../data/mockData";
 import {
   PlusOutlined,
   EditOutlined,
@@ -17,160 +16,6 @@ import {
 
 
 const { Option } = Select;
-
-// Mock data for livestock
-const initialLivestockData = [
-  {
-    key: "1",
-    id: "VN001",
-    name: "Bò sữa 01",
-    type: "cattle",
-    typeName: "Bò sữa",
-    weight: 450,
-    production: null,
-    health: "good",
-    healthName: "Khỏe mạnh",
-    barn: "A1",
-    barnName: "Chuồng A1",
-    entryDate: "2024-01-15",
-    status: "active"
-  },
-  {
-    key: "2",
-    id: "VN002",
-    name: "Bò thịt 01",
-    type: "cattle",
-    typeName: "Bò thịt",
-    weight: 520,
-    production: null,
-    health: "good",
-    healthName: "Khỏe mạnh",
-    barn: "A2",
-    barnName: "Chuồng A2",
-    entryDate: "2024-02-20",
-    status: "active"
-  },
-  {
-    key: "3",
-    id: "VN003",
-    name: "Lợn nái 01",
-    type: "pig",
-    typeName: "Lợn nái",
-    weight: 180,
-    production: 12,
-    health: "good",
-    healthName: "Khỏe mạnh",
-    barn: "B1",
-    barnName: "Chuồng B1",
-    entryDate: "2024-01-10",
-    status: "active"
-  },
-  {
-    key: "4",
-    id: "VN004",
-    name: "Lợn thịt 01",
-    type: "pig",
-    typeName: "Lợn thịt",
-    weight: 95,
-    production: null,
-    health: "warning",
-    healthName: "Theo dõi",
-    barn: "B2",
-    barnName: "Chuồng B2",
-    entryDate: "2024-03-01",
-    status: "active"
-  },
-  {
-    key: "5",
-    id: "VN005",
-    name: "Gà trống 01",
-    type: "chicken",
-    typeName: "Gà thịt",
-    weight: 3.5,
-    production: 15,
-    health: "good",
-    healthName: "Khỏe mạnh",
-    barn: "C1",
-    barnName: "Chuồng C1",
-    entryDate: "2024-02-15",
-    status: "active"
-  },
-  {
-    key: "6",
-    id: "VN006",
-    name: "Gà đẻ 01",
-    type: "chicken",
-    typeName: "Gà đẻ",
-    weight: 2.8,
-    production: 22,
-    health: "good",
-    healthName: "Khỏe mạnh",
-    barn: "C2",
-    barnName: "Chuồng C2",
-    entryDate: "2024-01-20",
-    status: "active"
-  },
-  {
-    key: "7",
-    id: "VN007",
-    name: "Vịt đẻ 01",
-    type: "duck",
-    typeName: "Vịt đẻ",
-    weight: 3.2,
-    production: 18,
-    health: "good",
-    healthName: "Khỏe mạnh",
-    barn: "C3",
-    barnName: "Chuồng C3",
-    entryDate: "2024-02-01",
-    status: "active"
-  },
-  {
-    key: "8",
-    id: "VN008",
-    name: "Trâu 01",
-    type: "buffalo",
-    typeName: "Trâu",
-    weight: 650,
-    production: null,
-    health: "good",
-    healthName: "Khỏe mạnh",
-    barn: "D1",
-    barnName: "Chuồng D1",
-    entryDate: "2023-12-01",
-    status: "active"
-  },
-  {
-    key: "9",
-    id: "VN009",
-    name: "Lợn thịt 02",
-    type: "pig",
-    typeName: "Lợn thịt",
-    weight: 110,
-    production: null,
-    health: "critical",
-    healthName: "Nghi ngờ",
-    barn: "B3",
-    barnName: "Chuồng B3",
-    entryDate: "2024-03-10",
-    status: "active"
-  },
-  {
-    key: "10",
-    id: "VN010",
-    name: "Bò sữa 02",
-    type: "cattle",
-    typeName: "Bò sữa",
-    weight: 420,
-    production: 25,
-    health: "good",
-    healthName: "Khỏe mạnh",
-    barn: "A1",
-    barnName: "Chuồng A1",
-    entryDate: "2024-01-25",
-    status: "active"
-  }
-];
 
 // Statistics data
 const statsData = [
@@ -214,36 +59,6 @@ const statsData = [
 ];
 
 
-// Barn data for select
-const barnOptions = [
-  { value: "A1", label: "Chuồng A1" },
-  { value: "A2", label: "Chuồng A2" },
-  { value: "B1", label: "Chuồng B1" },
-  { value: "B2", label: "Chuồng B2" },
-  { value: "B3", label: "Chuồng B3" },
-  { value: "C1", label: "Chuồng C1" },
-  { value: "C2", label: "Chuồng C2" },
-  { value: "C3", label: "Chuồng C3" },
-  { value: "D1", label: "Chuồng D1" },
-];
-
-// Livestock type options
-const typeOptions = [
-  { value: "cattle", label: "Bò sữa" },
-  { value: "beef_cattle", label: "Bò thịt" },
-  { value: "pig", label: "Lợn" },
-  { value: "chicken", label: "Gà" },
-  { value: "duck", label: "Vịt" },
-  { value: "buffalo", label: "Trâu" },
-];
-
-// Health status options
-const healthOptions = [
-  { value: "good", label: "Khỏe mạnh", color: "success" },
-  { value: "warning", label: "Theo dõi", color: "warning" },
-  { value: "critical", label: "Nghi ngờ", color: "error" },
-];
-
 export const Livestock = () => {
   const [data, setData] = useState(initialLivestockData);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -283,12 +98,10 @@ export const Livestock = () => {
       key: "typeName",
       width: 120,
       filters: [
-        { text: "Bò sữa", value: "Bò sữa" },
-        { text: "Bò thịt", value: "Bò thịt" },
+        { text: "Bò", value: "Bò" },
         { text: "Lợn", value: "Lợn" },
         { text: "Gà", value: "Gà" },
         { text: "Vịt", value: "Vịt" },
-        { text: "Trâu", value: "Trâu" },
       ],
       onFilter: (value, record) => record.typeName === value,
     },

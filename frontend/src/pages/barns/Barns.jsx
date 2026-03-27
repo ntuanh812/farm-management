@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageHeader } from "../../components/layout/PageHeader";
 import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, InputNumber, message } from "antd";
-
+import { initialBarnsData, barnTypeOptions, cleanlinessOptions } from "../../data/mockData";
 import {
   PlusOutlined,
   FallOutlined,
@@ -16,104 +16,7 @@ import {
 const { Option } = Select;
 
 // Mock data cho chuồng trại
-const initialBarnsData = [
-  {
-    key: "1",
-    id: "A1",
-    name: "Chuồng A1",
-    type: "cattle",
-    typeName: "Bò sữa",
-    capacity: 50,
-    currentCount: 20,
-    occupancy: 40,
-    cleanliness: "good",
-    cleanlinessName: "Sạch sẽ",
-    status: "active" },
-  {
-    key: "2",
-    id: "A2", 
-    name: "Chuồng A2",
-    type: "beef",
-    typeName: "Bò thịt",
-    capacity: 40,
-    currentCount: 15,
-    occupancy: 38,
-    cleanliness: "good",
-    cleanlinessName: "Sạch sẽ",
-    status: "active" },
-  {
-    key: "3",
-    id: "B1",
-    name: "Chuồng B1",
-    type: "sow",
-    typeName: "Lợn nái",
-    capacity: 100,
-    currentCount: 45,
-    occupancy: 45,
-    cleanliness: "warning",
-    cleanlinessName: "Cần vệ sinh",
-    status: "active"},
-  {
-    key: "4",
-    id: "B2",
-    name: "Chuồng B2",
-    type: "pig",
-    typeName: "Lợn thịt",
-    capacity: 120,
-    currentCount: 80,
-    occupancy: 67,
-    cleanliness: "good",
-    cleanlinessName: "Sạch sẽ",
-    status: "active"},
-  {
-    key: "5",
-    id: "C1",
-    name: "Chuồng C1",
-    type: "broiler",
-    typeName: "Gà thịt",
-    capacity: 5000,
-    currentCount: 3200,
-    occupancy: 64,
-    cleanliness: "good",
-    cleanlinessName: "Sạch sẽ", 
-    status: "active" },
-  {
-    key: "6",
-    id: "C2",
-    name: "Chuồng C2",
-    type: "layer",
-    typeName: "Gà đẻ",
-    capacity: 4000,
-    currentCount: 2800,
-    occupancy: 70,
-    cleanliness: "good",
-    cleanlinessName: "Sạch sẽ",
-    status: "active" 
-  },
-  {
-    key: "7",
-    id: "D1",
-    name: "Chuồng D1",
-    type: "buffalo",
-    typeName: "Trâu",
-    capacity: 30,
-    currentCount: 12,
-    occupancy: 40,
-    cleanliness: "good",
-    cleanlinessName: "Sạch sẽ",
-    status: "active"},
-  {
-    key: "8",
-    id: "B3",
-    name: "Chuồng B3",
-    type: "pig",
-    typeName: "Lợn thịt",
-    capacity: 100,
-    currentCount: 65,
-    occupancy: 65,
-    cleanliness: "critical",
-    cleanlinessName: "Bẩn, cần xử lý",
-    status: "maintenance" }];
+
 
 // Thống kê
 const statsData = [
@@ -155,23 +58,6 @@ const statsData = [
   }
 ];
 
-// Loại chuồng options
-const barnTypeOptions = [
-  { value: "cattle", label: "Bò sữa" },
-  { value: "beef", label: "Bò thịt" },
-  { value: "sow", label: "Lợn nái" },
-  { value: "pig", label: "Lợn thịt" },
-  { value: "broiler", label: "Gà thịt" },
-  { value: "layer", label: "Gà đẻ" },
-  { value: "buffalo", label: "Trâu" }
-];
-
-// Cleanliness options
-const cleanlinessOptions = [
-  { value: "good", label: "Sạch sẽ", color: "success" },
-  { value: "warning", label: "Cần vệ sinh", color: "warning" },
-  { value: "critical", label: "Bẩn, cần xử lý", color: "error" }
-];
 
 export const Barns = () => {
   const [data, setData] = useState(initialBarnsData);

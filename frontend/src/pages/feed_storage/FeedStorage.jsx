@@ -14,69 +14,11 @@ import {
   FallOutlined,
   AppleOutlined,
 } from "@ant-design/icons";
-
+import { initialFeedData } from "../../data/mockData";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-// Mock data for feed storage items - matching pattern (barns, livestock, tasks)
-const initialFeedData = [
-  {
-    key: "1",
-    id: "TA001",
-    name: "Cỏ voi",
-    type: "grass",
-    typeName: "Cỏ",
-    quantity: 1250,
-    unit: "kg",
-    expiryDate: "2024-12-15",
-    room: "P1",
-    roomName: "Phòng 1 ",
-    status: "good",
-    progress: 75
-  },
-  {
-    key: "2",
-    id: "TA002",
-    name: "Thức ăn hỗn hợp lợn",
-    type: "mixed",
-    typeName: "Thức ăn hỗn hợp công nghiệp",
-    quantity: 350,
-    unit: "kg",
-    expiryDate: "2024-10-25",
-    room: "P2",
-    roomName: "Phòng 2 ",
-    status: "warning",
-    progress: 45
-  },
-  {
-    key: "3",
-    id: "TA003",
-    name: "Silage bắp",
-    type: "fermented",
-    typeName: "Thức ăn lên men",
-    quantity: 800,
-    unit: "kg",
-    expiryDate: "2024-11-10",
-    room: "P1",
-    roomName: "Phòng 1 ",
-    status: "good",
-    progress: 90
-  },
-  {
-    key: "4",
-    id: "TA004",
-    name: "Cám gạo",
-    type: "byproduct",
-    typeName: "Phụ phẩm nông nghiệp",
-    quantity: 500,
-    unit: "kg",
-    expiryDate: "2024-09-30",
-    room: "P3",
-    roomName: "Phòng 3 ",
-    status: "critical",
-  },
-  
-];
+
 
 // Stats data matching exact pattern
 const statsData = [
@@ -133,8 +75,6 @@ const statusOptions = [
   { value: "warning", label: "Cảnh báo", color: "warning" },
   { value: "critical", label: "Hết hạn", color: "error" }
 ];
-
-
 
 // Shelf options
 const roomOptions = [

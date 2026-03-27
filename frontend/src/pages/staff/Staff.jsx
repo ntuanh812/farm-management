@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { PageHeader } from "../../components/layout/PageHeader";
 import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, InputNumber, message, DatePicker } from "antd";
-
+import { initialStaffData, roleOptions, statusOptions } from "../../data/mockData";
 import {
   PlusOutlined,
   EditOutlined,
@@ -20,139 +19,7 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 // Mock data for staff
-const initialStaffData = [
-  {
-    key: "1",
-    id: "NV001",
-    name: "Nguyễn Văn A",
-    role: "manager",
-    roleName: "Quản lý",
-    department: "admin",
-    deptName: "Hành chính",
-    salary: 15000000,
-    phone: "0901234567",
-    hireDate: "2023-01-15",
-    status: "active"
-  },
-  {
-    key: "2",
-    id: "NV002",
-    name: "Trần Thị B",
-    role: "veterinarian",
-    roleName: "Thú y",
-    department: "livestock",
-    deptName: "Chăn nuôi",
-    salary: 12000000,
-    phone: "0902345678",
-    hireDate: "2023-06-20",
-    status: "active"
-  },
-  {
-    key: "3",
-    id: "NV003",
-    name: "Lê Văn C",
-    role: "farmer",
-    roleName: "Công nhân",
-    department: "livestock",
-    deptName: "Chăn nuôi",
-    salary: 8000000,
-    phone: "0903456789",
-    hireDate: "2024-01-10",
-    status: "active"
-  },
-  // Thêm 7 records nữa tương tự...
-  {
-    key: "4",
-    id: "NV004",
-    name: "Phạm Thị D",
-    role: "accountant",
-    roleName: "Kế toán",
-    department: "finance",
-    deptName: "Tài chính",
-    salary: 10000000,
-    phone: "0904567890",
-    hireDate: "2023-03-01",
-    status: "active"
-  },
-  {
-    key: "5",
-    id: "NV005",
-    name: "Hoàng Văn E",
-    role: "technician",
-    roleName: "Kỹ thuật",
-    department: "maintenance",
-    deptName: "Bảo trì",
-    salary: 9000000,
-    phone: "0905678901",
-    hireDate: "2023-11-15",
-    status: "leave"
-  },
-  {
-    key: "6",
-    id: "NV006",
-    name: "Vũ Thị F",
-    role: "hr",
-    roleName: "Nhân sự",
-    department: "admin",
-    deptName: "Hành chính",
-    salary: 11000000,
-    phone: "0906789012",
-    hireDate: "2024-02-01",
-    status: "active"
-  },
-  {
-    key: "7",
-    id: "NV007",
-    name: "Đặng Văn G",
-    role: "farmer",
-    roleName: "Công nhân",
-    department: "livestock",
-    deptName: "Chăn nuôi",
-    salary: 7500000,
-    phone: "0907890123",
-    hireDate: "2024-04-10",
-    status: "active"
-  },
-  {
-    key: "8",
-    id: "NV008",
-    name: "Bùi Thị H",
-    role: "veterinarian",
-    roleName: "Thú y",
-    department: "livestock",
-    deptName: "Chăn nuôi",
-    salary: 13000000,
-    phone: "0908901234",
-    hireDate: "2023-09-05",
-    status: "active"
-  },
-  {
-    key: "9",
-    id: "NV009",
-    name: "Ngô Văn I",
-    role: "manager",
-    roleName: "Quản lý",
-    department: "livestock",
-    deptName: "Chăn nuôi",
-    salary: 18000000,
-    phone: "0909012345",
-    hireDate: "2022-12-01",
-    status: "active"
-  },
-  {
-    key: "10",
-    id: "NV010",
-    name: "Lý Thị K",
-    role: "cleaner",
-    roleName: "Vệ sinh",
-    department: "maintenance",
-    deptName: "Bảo trì",
-    salary: 6000000,
-    phone: "0910123456",
-    hireDate: "2024-05-15",
-    status: "trial"
-  }
-];
+
 
 // Statistics data
 const statsData = [
@@ -194,31 +61,6 @@ const statsData = [
   }
 ];
 
-// Role options
-const roleOptions = [
-  { value: "manager", label: "Quản lý" },
-  { value: "veterinarian", label: "Thú y" },
-  { value: "farmer", label: "Công nhân" },
-  { value: "accountant", label: "Kế toán" },
-  { value: "technician", label: "Kỹ thuật" },
-  { value: "hr", label: "Nhân sự" },
-  { value: "cleaner", label: "Vệ sinh" }
-];
-
-// Department options
-const deptOptions = [
-  { value: "admin", label: "Hành chính" },
-  { value: "livestock", label: "Chăn nuôi" },
-  { value: "finance", label: "Tài chính" },
-  { value: "maintenance", label: "Bảo trì" }
-];
-
-// Status options
-const statusOptions = [
-  { value: "active", label: "Đang làm", color: "success" },
-  { value: "leave", label: "Nghỉ phép", color: "warning" },
-  { value: "trial", label: "Thử việc", color: "blue" }
-];
 
 export const Staff = () => {
   const [data, setData] = useState(initialStaffData);
@@ -232,8 +74,7 @@ export const Staff = () => {
   const filteredData = data.filter(item => 
     item.name.toLowerCase().includes(searchText.toLowerCase()) ||
     item.id.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.roleName.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.deptName.toLowerCase().includes(searchText.toLowerCase())
+    item.roleName.toLowerCase().includes(searchText.toLowerCase())
   );
 
   // Table columns
@@ -261,15 +102,6 @@ export const Staff = () => {
       filters: roleOptions.map(opt => ({ text: opt.label, value: opt.label })),
       onFilter: (value, record) => record.roleName === value,
     },
-    {
-      title: "Phòng ban",
-      dataIndex: "deptName",
-      key: "department",
-      width: 120,
-      filters: deptOptions.map(opt => ({ text: opt.label, value: opt.label })),
-      onFilter: (value, record) => record.deptName === value,
-    },
-    // Lương column removed as per feedback
     {
       title: "SĐT",
       dataIndex: "phone",
@@ -367,7 +199,7 @@ export const Staff = () => {
                 ...item, 
                 ...values,
                 roleName: roleOptions.find(r => r.value === values.role)?.label || values.roleName,
-                deptName: deptOptions.find(d => d.value === values.department)?.label || values.deptName
+  
               } 
             : item
         ));
@@ -380,7 +212,6 @@ export const Staff = () => {
           id: `NV${String(data.length + 1).padStart(3, "0")}`,
           ...values,
           roleName: roleOptions.find(r => r.value === values.role)?.label || values.role,
-          deptName: deptOptions.find(d => d.value === values.department)?.label || values.department,
           status: "active"
         };
         setData([...data, newItem]);
@@ -479,25 +310,11 @@ export const Staff = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="department" label="Phòng ban" rules={[{ required: true }]}>
-                <Select placeholder="Chọn phòng ban">
-                  {deptOptions.map(option => (
-                    <Option key={option.value} value={option.value}>{option.label}</Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            
-            <Col span={12}>
               <Form.Item name="phone" label="Số điện thoại">
                 <Input placeholder="Nhập số điện thoại" />
               </Form.Item>
             </Col>
           </Row>
-
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="hireDate" label="Ngày vào làm" rules={[{ required: true }]}>
