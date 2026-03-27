@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageHeader } from "../../components/layout/PageHeader";
-import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, InputNumber, message } from "antd";
+import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Cascader, InputNumber, message, Select } from "antd";
 import { initialLivestockData } from "../../data/mockData";
 import {
   PlusOutlined,
@@ -15,13 +15,13 @@ import {
 } from "@ant-design/icons";
 
 
-const { Option } = Select;
+
 
 // Statistics data
 const statsData = [
   {
     title: "Tổng vật nuôi",
-    value: 10,
+    value: 7,
     unit: "con",
     icon: <AppleOutlined />,
     type: "livestock",
@@ -69,12 +69,24 @@ const barnOptions = [
   { value: "D1", label: "Chuồng D1" },
 ];
 
-// Livestock type options
-const typeOptions = [
-  { value: "poultry", label: "Gia cầm" },
-  { value: "cattle", label: "Gia súc" },
+const typeCascaderOptions = [
+  {
+    value: "poultry",
+    label: "Gia cầm",
+    children: [
+      { value: "meat", label: "Lấy thịt" },
+      { value: "egg", label: "Lấy trứng" }
+    ]
+  },
+  {
+    value: "cattle", 
+    label: "Gia súc",
+    children: [
+      { value: "meat", label: "Lấy thịt" },
+      { value: "milk", label: "Lấy sữa" }
+    ]
+  }
 ];
-
 
 const healthOptions = [
   { value: "good", label: "Khỏe mạnh", color: "success" },
@@ -120,15 +132,17 @@ export const Livestock = () => {
       title: "Loại",
       dataIndex: "typeName",
       key: "typeName",
-      width: 120,
+      width: 160,
       filters: [
-        { text: "Bò", value: "Bò" },
-        { text: "Lợn", value: "Lợn" },
-        { text: "Gà", value: "Gà" },
-        { text: "Vịt", value: "Vịt" },
+        { text: "Gia súc - Lấy sữa", value: "Gia súc - Lấy sữa" },
+        { text: "Gia súc - Lấy thịt", value: "Gia súc - Lấy thịt" },
+        { text: "Gia cầm - Lấy thịt", value: "Gia cầm - Lấy thịt" },
+        { text: "Gia cầm - Lấy trứng", value: "Gia cầm - Lấy trứng" }
       ],
       onFilter: (value, record) => record.typeName === value,
+      render: (typeName) => <Tag>{typeName}</Tag>
     },
+
     {
       title: "Chuồng",
       dataIndex: "barnName",
@@ -138,31 +152,30 @@ export const Livestock = () => {
       onFilter: (value, record) => record.barn === value,
     },
     {
-      title: "Cân nặng",
+      title: "Cân nặng", 
       dataIndex: "weight",
       key: "weight",
       width: 110,
       sorter: (a, b) => a.weight - b.weight,
-      render: (weight, record) => {
-        const unit = ["chicken", "duck"].includes(record.type) ? "kg" : "kg";
-        return weight ? `${weight} ${unit}` : "-";
-      },
+      render: (weight) => weight ? `${weight.toFixed(1)} kg` : "-",
     },
+
     {
       title: "Sản lượng",
-      dataIndex: "production",
+      dataIndex: "production", 
       key: "production",
-      width: 110,
-      render: (production, record) => {
-        if (["chicken", "duck"].includes(record.type)) {
-          return production ? `${production} trứng/tuần` : "-";
-        }
-        if (record.type === "cattle") {
-          return production ? `${production} lít/ngày` : "-";
-        }
-        return "-";
+      width: 140,
+      sorter: (a, b) => (a.production || 0) - (b.production || 0),
+      render: (_, record) => {
+        if (record.subType === "meat") return <Tag>-</Tag>;
+        const unit = record.subType === "egg" ? "trứng/tuần" : 
+                    record.subType === "milk" ? "lít/ngày" : "";
+        return record.production ? 
+          <Tag color="blue">{record.production} {unit}</Tag> : 
+          <Tag>Chưa có</Tag>;
       },
     },
+
     {
       title: "Sức khỏe",
       dataIndex: "healthName",
@@ -230,7 +243,8 @@ export const Livestock = () => {
     setSelectedRecord(record);
     form.setFieldsValue({
       ...record,
-      barn: record.barn
+      barn: record.barn,
+      livestockType: [record.type, record.subType]
     });
     setIsModalOpen(true);
   };
@@ -259,12 +273,16 @@ export const Livestock = () => {
     form.validateFields().then(values => {
       if (selectedRecord) {
         // Update existing
+        const [updateType, updateSubType] = values.livestockType || [selectedRecord.type, selectedRecord.subType];
         setData(data.map(item => 
           item.key === selectedRecord.key 
             ? { 
                 ...item, 
-                ...values, 
-                typeName: typeOptions.find(t => t.value === values.type)?.label || values.typeName,
+                ...values,
+                type: updateType,
+                subType: updateSubType,
+                production: updateSubType === "meat" ? null : values.production,
+                typeName: `${typeCascaderOptions.find(t => t.value === updateType)?.label || updateType} - ${typeCascaderOptions.find(t => t.value === updateType)?.children.find(c => c.value === updateSubType)?.label || updateSubType}`,
                 barnName: barnOptions.find(b => b.value === values.barn)?.label || values.barnName,
                 healthName: healthOptions.find(h => h.value === values.health)?.label || values.healthName
               } 
@@ -274,21 +292,25 @@ export const Livestock = () => {
       } else {
         // Add new
         const newKey = (parseInt(data[data.length - 1]?.key || "0") + 1).toString();
+        const [newType, newSubType] = values.livestockType || [];
         const newItem = {
           key: newKey,
           id: `VN${String(data.length + 1).padStart(3, "0")}`,
-          ...values,
-          typeName: typeOptions.find(t => t.value === values.type)?.label || values.type,
+          type: newType,
+          subType: newSubType,
+          production: newSubType === "meat" ? null : values.production,
+          typeName: `${typeCascaderOptions.find(t => t.value === newType)?.label || newType} - ${typeCascaderOptions.find(t => t.value === newType)?.children.find(c => c.value === newSubType)?.label || newSubType}`,
           barnName: barnOptions.find(b => b.value === values.barn)?.label || values.barn,
           healthName: healthOptions.find(h => h.value === values.health)?.label || values.health,
-          status: "active"
+          status: "active",
+          ...values
         };
         setData([...data, newItem]);
         message.success("Thêm vật nuôi mới thành công!");
       }
       setIsModalOpen(false);
       form.resetFields();
-    });
+    }).catch(() => {});
   };
 
   return (
@@ -379,15 +401,15 @@ export const Livestock = () => {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name="type"
+                name="livestockType"
                 label="Loại vật nuôi"
                 rules={[{ required: true, message: "Vui lòng chọn loại!" }]}
               >
-                <Select placeholder="Chọn loại vật nuôi">
-                  {typeOptions.map(option => (
-                    <Option key={option.value} value={option.value}>{option.label}</Option>
-                  ))}
-                </Select>
+                <Cascader 
+                  options={typeCascaderOptions} 
+                  placeholder="Gia cầm/Lấy thịt → Gia súc/Lấy sữa" 
+                  disabled={!!selectedRecord}
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -428,6 +450,7 @@ export const Livestock = () => {
                   placeholder="Nhập sản lượng" 
                   style={{ width: "100%" }}
                   min={0}
+                  disabled={selectedRecord && selectedRecord.subType === "meat"}
                 />
               </Form.Item>
             </Col>

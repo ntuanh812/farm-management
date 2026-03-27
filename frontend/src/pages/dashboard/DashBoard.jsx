@@ -1,5 +1,5 @@
 import { PageHeader } from "../../components/layout/PageHeader";
-import { Card, Row, Col, Typography, List } from "antd";
+import { Card, Row, Col, List } from "antd";
 import {
   RiseOutlined,
   FallOutlined,
@@ -12,8 +12,6 @@ import {
   AndroidOutlined
 } from "@ant-design/icons";
 import { activities } from "../../data/mockData";
-
-const { Title, Text } = Typography;
 
 export const DashBoard = () => {
   const statsData = [
@@ -62,7 +60,7 @@ export const DashBoard = () => {
         return <AuditOutlined />;
       case "feed":
         return <AppleOutlined />;
-      case "daily-tasks":
+      case "tasks":
         return <SnippetsOutlined />;
       default:
         return <DashboardOutlined />;
@@ -159,7 +157,6 @@ export const DashBoard = () => {
             </Card>
           </Col>
         </Row>
-
       </div>
     </div>
   );
