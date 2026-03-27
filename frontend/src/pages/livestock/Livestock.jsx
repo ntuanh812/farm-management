@@ -14,8 +14,10 @@ import {
   InputNumber,
   Select,
   message,
+  Row,
+  Col
 } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
+import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, HomeOutlined, RiseOutlined, FallOutlined, UserOutlined, PushpinOutlined } from "@ant-design/icons";
 import { initialLivestockData, initialBarnsData } from "../../data/mockData";
 
 const categoryOptions = [
@@ -46,6 +48,45 @@ const statusOptions = [
   { value: "active", label: "Hoạt động" },
   { value: "sold", label: "Đã bán" },
   { value: "dead", label: "Đã chết" },
+];
+
+const statsData = [
+  {
+    title: "Tổng vật nuôi",
+    value: 150,
+    unit: "con",
+    icon: <UserOutlined />,
+    type: "livestock",
+    trend: "+12",
+    trendUp: true
+  },
+  {
+    title: "Vật nuôi khỏe",
+    value: 92,
+    unit: "%",
+    icon: <RiseOutlined />,
+    type: "livestock",
+    trend: "+2%",
+    trendUp: true
+  },
+  {
+    title: "Gia súc",
+    value: 120,
+    unit: "con",
+    icon: <HomeOutlined />,
+    type: "livestock",
+    trend: "+5",
+    trendUp: true
+  },
+  {
+    title: "Gia cầm",
+    value: 30,
+    unit: "con", 
+    icon: <PushpinOutlined />,
+    type: "poultry",
+    trend: "-3",
+    trendUp: false
+  }
 ];
 
 export const Livestock = () => {
@@ -182,13 +223,33 @@ export const Livestock = () => {
     <div className="livestock">
       <PageHeader
         title="Quản lý vật nuôi"
-        subtitle="Đang đồng bộ schema backend"
+        subtitle="Theo dõi và quản lý thông tin vật nuôi trong trang trại"
         actions={
           <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
             Thêm vật nuôi
           </Button>
         }
       />
+<Row gutter={[20, 20]} className="livestock-stats">
+          {statsData.map((stat, index) => (
+            <Col xs={24} sm={12} lg={6} key={index}>
+              <Card className={`stat-card stat-card--${stat.type}`}>
+                <div className="stat-card__header">
+                  <span className="stat-card__title">{stat.title}</span>
+                  <div className="stat-card__icon">{stat.icon}</div>
+                </div>
+                <div className="stat-card__value">
+                  {stat.value}
+                  <span className="stat-card__label"> {stat.unit}</span>
+                </div>
+                <div className={`stat-card__trend ${stat.trendUp ? 'stat-card__trend--up' : 'stat-card__trend--down'}`}>
+                  {stat.trendUp ? <RiseOutlined /> : <FallOutlined />}
+                  <span>{stat.trend} so với tháng trước</span>
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
       <Card>
         <Table rowKey="_id" columns={columns} dataSource={data} />
       </Card>
