@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageHeader } from "../../components/layout/PageHeader";
 import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, InputNumber, message } from "antd";
@@ -14,9 +14,6 @@ import {
   HomeOutlined} from "@ant-design/icons";
 
 const { Option } = Select;
-
-// Mock data cho chuồng trại
-
 
 // Thống kê
 const statsData = [
@@ -57,15 +54,22 @@ const statsData = [
     trendUp: true
   }
 ];
+
 const barnTypeOptions = [
-  { value: "poultry", label: "Gia cầm" },
-  { value: "cattle", label: "Gia súc" }
+  { value: "cow", label: "Bò" },
+  { value: "pig", label: "Lợn" },
+  { value: "chicken", label: "Gà" },
 ];
 
 const cleanlinessOptions = [
-  { value: "good", label: "Sạch sẽ", color: "success" },
-  { value: "warning", label: "Cần vệ sinh", color: "warning" },
-  { value: "critical", label: "Bẩn, cần xử lý", color: "error" }
+  { value: "clean", label: "Sạch", color: "success" },
+  { value: "normal", label: "Bình thường", color: "warning" },
+  { value: "dirty", label: "Bẩn", color: "error" },
+];
+
+const statusOptions = [
+  { value: "active", label: "Đang hoạt động", color: "success" },
+  { value: "maintenance", label: "Bảo trì", color: "warning" },
 ];
 
 
@@ -77,22 +81,30 @@ export const Barns = () => {
   const [searchText, setSearchText] = useState("");
   const navigate = useNavigate();
 
+  const derivedData = useMemo(
+    () =>
+      data.map((item) => ({
+        ...item,
+        occupancy: item.capacity ? Math.round(((item.currentCount || 0) / item.capacity) * 100) : 0,
+      })),
+    [data]
+  );
+
   // Filter data
-  const filteredData = data.filter(item => 
+  const filteredData = derivedData.filter(item => 
     item.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.id.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.typeName.toLowerCase().includes(searchText.toLowerCase())
+    item.code.toLowerCase().includes(searchText.toLowerCase())
   );
 
   // Table columns
   const columns = [
     {
       title: "Mã chuồng",
-      dataIndex: "id",
-      key: "id",
+      dataIndex: "code",
+      key: "code",
       width: 100,
       fixed: "left",
-      sorter: (a, b) => a.id.localeCompare(b.id),
+      sorter: (a, b) => a.code.localeCompare(b.code),
     },
     {
       title: "Tên chuồng",
@@ -103,11 +115,12 @@ export const Barns = () => {
     },
     {
       title: "Loại",
-      dataIndex: "typeName",
-      key: "typeName",
+      dataIndex: "type",
+      key: "type",
       width: 120,
-      filters: barnTypeOptions.map(opt => ({ text: opt.label, value: opt.label })),
-      onFilter: (value, record) => record.typeName === value,
+      filters: barnTypeOptions.map(opt => ({ text: opt.label, value: opt.value })),
+      onFilter: (value, record) => record.type === value,
+      render: (value) => barnTypeOptions.find((opt) => opt.value === value)?.label || value,
     },
     {
       title: "Sức chứa",
@@ -123,16 +136,25 @@ export const Barns = () => {
     },
     {
       title: "Độ sạch",
-      dataIndex: "cleanlinessName",
+      dataIndex: "cleanliness",
       key: "cleanliness",
       width: 120,
-      render: (cleanlinessName, record) => {
-        const color = record.cleanliness === "good" ? "success" : 
-                     record.cleanliness === "warning" ? "warning" : "error";
-        return <Tag color={color}>{cleanlinessName}</Tag>;
+      render: (value) => {
+        const opt = cleanlinessOptions.find((item) => item.value === value);
+        return <Tag color={opt?.color || "default"}>{opt?.label || value}</Tag>;
       },
-      filters: cleanlinessOptions,
+      filters: cleanlinessOptions.map((opt) => ({ text: opt.label, value: opt.value })),
       onFilter: (value, record) => record.cleanliness === value,
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      width: 140,
+      render: (value) => {
+        const opt = statusOptions.find((item) => item.value === value);
+        return <Tag color={opt?.color || "default"}>{opt?.label || value}</Tag>;
+      },
     },
     {
       title: "Thao tác",
@@ -145,7 +167,7 @@ export const Barns = () => {
             <Button 
               type="text" 
               icon={<EyeOutlined />} 
-              onClick={() => navigate(`/barns/${record.id}`)}
+              onClick={() => navigate(`/barns/${record._id}`)}
               className="action-btn action-btn--view"
             />
           </Tooltip>
@@ -184,7 +206,7 @@ export const Barns = () => {
       okType: "danger",
       cancelText: "Hủy",
       onOk() {
-        setData(data.filter(item => item.key !== record.key));
+        setData(data.filter(item => item._id !== record._id));
         message.success("Xóa chuồng thành công!");
       },
     });
@@ -198,22 +220,16 @@ export const Barns = () => {
 
   const handleModalOk = () => {
     form.validateFields().then(values => {
-      const processedValues = {
-        ...values,
-        typeName: barnTypeOptions.find(t => t.value === values.type)?.label || values.typeName,
-        cleanlinessName: cleanlinessOptions.find(h => h.value === values.cleanliness)?.label || values.cleanlinessName,
-        occupancy: Math.round((values.currentCount / values.capacity) * 100),
-        status: "active"
-      };
-
       if (selectedRecord) {
-        setData(data.map(item => 
-          item.key === selectedRecord.key ? { ...item, ...processedValues } : item
-        ));
+        setData(data.map(item => (item._id === selectedRecord._id ? { ...item, ...values } : item)));
         message.success("Cập nhật chuồng thành công!");
       } else {
-        const newKey = (parseInt(data[data.length - 1]?.key || "0") + 1).toString();
-        const newItem = { key: newKey, id: `BN${String(data.length + 1).padStart(2, "0")}`, ...processedValues };
+        const newItem = {
+          _id: `barn-${Date.now()}`,
+          ...values,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
         setData([...data, newItem]);
         message.success("Thêm chuồng mới thành công!");
       }
@@ -280,6 +296,7 @@ export const Barns = () => {
             }}
             scroll={{ x: 1200 }}
             className="barns-table"
+            rowKey="_id"
           />
         </Card>
       </div>
@@ -297,7 +314,7 @@ export const Barns = () => {
         <Form form={form} layout="vertical" className="barns-form">
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="id" label="Mã chuồng" rules={[{ required: true }]}>
+              <Form.Item name="code" label="Mã chuồng" rules={[{ required: true }]}>
                 <Input placeholder="Nhập mã chuồng" disabled={!!selectedRecord} />
               </Form.Item>
             </Col>
@@ -341,6 +358,16 @@ export const Barns = () => {
               </Form.Item>
             </Col>
           </Row>
+
+          <Form.Item name="status" label="Trạng thái" initialValue="active" rules={[{ required: true }]}>
+            <Select placeholder="Chọn trạng thái">
+              {statusOptions.map((opt) => (
+                <Option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
         </Form>
       </Modal>
     </div>

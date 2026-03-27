@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { PageHeader } from "../../components/layout/PageHeader";
-import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, InputNumber, DatePicker, Progress, message } from "antd";
+import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, DatePicker, message } from "antd";
 
 import {
   PlusOutlined,
@@ -18,107 +18,8 @@ import {
 } from "@ant-design/icons";
 
 const { Option } = Select;
-const { RangePicker } = DatePicker;
 
-// Mock data for daily tasks - consistent với Livestock/Barns/Staff pattern
-const initialTasksData = [
-  {
-    key: "1",
-    id: "TK001",
-    title: "Kiểm tra sức khỏe đàn bò sữa",
-    category: "health",
-    categoryName: "Sức khỏe",
-    assignee: "NV001",
-    assigneeName: "Nguyễn Văn A",
-    barn: "A1",
-    barnName: "Chuồng A1",
-    priority: "high",
-    priorityName: "Cao",
-    dueDate: "2024-10-20",
-    status: "pending",
-    progress: 30
-  },
-  {
-    key: "2",
-    id: "TK002",
-    title: "Vệ sinh chuồng lợn B2",
-    category: "maintenance",
-    categoryName: "Bảo trì",
-    assignee: "NV003",
-    assigneeName: "Lê Văn C",
-    barn: "B2",
-    barnName: "Chuồng B2",
-    priority: "medium",
-    priorityName: "Trung bình",
-    dueDate: "2024-10-19",
-    status: "in-progress",
-    progress: 70
-  },
-  {
-    key: "3",
-    id: "TK003",
-    title: "Cho ăn đàn gà C1",
-    category: "feeding",
-    categoryName: "Cho ăn",
-    assignee: "NV007",
-    assigneeName: "Đặng Văn G",
-    barn: "C1",
-    barnName: "Chuồng C1",
-    priority: "low",
-    priorityName: "Thấp",
-    dueDate: "2024-10-21",
-    status: "completed",
-    progress: 100
-  },
-  {
-    key: "4",
-    id: "TK004",
-    title: "Tiêm vaccine lợn B3 (OVERDUE)",
-    category: "vaccine",
-    categoryName: "Tiêm chủng",
-    assignee: "NV002",
-    assigneeName: "Trần Thị B",
-    barn: "B3",
-    barnName: "Chuồng B3",
-    priority: "high",
-    priorityName: "Cao",
-    dueDate: "2024-10-18",
-    status: "overdue",
-    progress: 20
-  },
-  {
-    key: "5",
-    id: "TK005",
-    title: "Kiểm tra nhiệt độ tất cả chuồng",
-    category: "monitoring",
-    categoryName: "Giám sát",
-    assignee: "NV009",
-    assigneeName: "Ngô Văn I",
-    barn: "all",
-    barnName: "Tất cả",
-    priority: "medium",
-    priorityName: "Trung bình",
-    dueDate: "2024-10-20",
-    status: "pending",
-    progress: 0
-  },
-  {
-    key: "6",
-    id: "TK006",
-    title: "Báo cáo sản lượng ngày",
-    category: "report",
-    categoryName: "Báo cáo",
-    assignee: "NV001",
-    assigneeName: "Nguyễn Văn A",
-    barn: "",
-    barnName: "",
-    priority: "high",
-    priorityName: "Cao",
-    dueDate: "2024-10-20",
-    status: "in-progress",
-    progress: 50
-  }
-];
+import { initialTasksData, initialStaffData, initialBarnsData, initialLivestockData } from "../../data/mockData";
 
 // Statistics data - matching pattern
 const statsData = [
@@ -160,40 +61,24 @@ const statsData = [
   }
 ];
 
-// Category options - matching typeOptions pattern
+// Category options - backend enum
 const categoryOptions = [
-  { value: "health", label: "Sức khỏe" },
   { value: "feeding", label: "Cho ăn" },
-  { value: "maintenance", label: "Bảo trì" },
-  { value: "vaccine", label: "Tiêm chủng" },
-  { value: "monitoring", label: "Giám sát" },
-  { value: "report", label: "Báo cáo" }
+  { value: "cleaning", label: "Vệ sinh" },
+  { value: "medical", label: "Y tế" },
 ];
 
-// Priority options - matching healthOptions pattern
+// Priority options - backend enum
 const priorityOptions = [
   { value: "low", label: "Thấp", color: "default" },
   { value: "medium", label: "Trung bình", color: "warning" },
   { value: "high", label: "Cao", color: "error" }
 ];
 
-// Staff options (refs from Staff data)
-// Staff options - mock from pattern
-const staffOptions = [
-  { value: "NV001", label: "Nguyễn Văn A (Quản lý)" },
-  { value: "NV002", label: "Trần Thị B (Thú y)" },
-  { value: "NV003", label: "Lê Văn C (Công nhân)" },
-  { value: "NV007", label: "Đặng Văn G (Công nhân)" },
-  { value: "NV009", label: "Ngô Văn I (Quản lý)" }
-];
-
-// Barn options - mock from pattern
-const barnOptions = [
-  { value: "A1", label: "Chuồng A1" },
-  { value: "B2", label: "Chuồng B2" },
-  { value: "B3", label: "Chuồng B3" },
-  { value: "C1", label: "Chuồng C1" },
-  { value: "all", label: "Tất cả" }
+const statusOptions = [
+  { value: "pending", label: "Chờ", color: "default" },
+  { value: "in_progress", label: "Đang làm", color: "processing" },
+  { value: "done", label: "Hoàn thành", color: "success" },
 ];
 
 export const Tasks = () => {
@@ -203,23 +88,34 @@ export const Tasks = () => {
   const [form] = Form.useForm();
   const [searchText, setSearchText] = useState("");
 
+  const staffMap = useMemo(
+    () => Object.fromEntries(initialStaffData.map((s) => [s._id, `${s.code} - ${s.name}`])),
+    []
+  );
+  const barnMap = useMemo(
+    () => Object.fromEntries(initialBarnsData.map((b) => [b._id, `${b.code} - ${b.name}`])),
+    []
+  );
+  const livestockMap = useMemo(
+    () => Object.fromEntries(initialLivestockData.map((l) => [l._id, l.tagCode])),
+    []
+  );
+
   // Filter data
   const filteredData = data.filter(item => 
     item.title.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.id.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.categoryName.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.assigneeName.toLowerCase().includes(searchText.toLowerCase())
+    item.code.toLowerCase().includes(searchText.toLowerCase())
   );
 
   // Table columns - matching pattern
   const columns = [
     {
       title: "Mã công việc",
-      dataIndex: "id",
-      key: "id",
+      dataIndex: "code",
+      key: "code",
       width: 100,
       fixed: "left",
-      sorter: (a, b) => a.id.localeCompare(b.id),
+      sorter: (a, b) => a.code.localeCompare(b.code),
     },
     {
       title: "Tiêu đề",
@@ -231,52 +127,45 @@ export const Tasks = () => {
     },
     {
       title: "Loại",
-      dataIndex: "categoryName",
+      dataIndex: "category",
       key: "category",
       width: 120,
-      filters: categoryOptions.map(opt => ({ text: opt.label, value: opt.label })),
-      onFilter: (value, record) => record.categoryName === value,
+      filters: categoryOptions.map(opt => ({ text: opt.label, value: opt.value })),
+      onFilter: (value, record) => record.category === value,
+      render: (value) => categoryOptions.find((c) => c.value === value)?.label || value,
     },
     {
       title: "Người thực hiện",
-      dataIndex: "assigneeName",
-      key: "assignee",
+      dataIndex: "assigneeId",
+      key: "assigneeId",
       width: 150,
-      render: (name, record) => (
-        <Tag>{record.assignee} - {name}</Tag>
-      )
+      render: (value) => <Tag>{staffMap[value] || "-"}</Tag>,
     },
     {
       title: "Chuồng",
-      dataIndex: "barnName",
-      key: "barn",
+      dataIndex: "barnId",
+      key: "barnId",
       width: 120,
+      render: (value) => barnMap[value] || "-",
+    },
+    {
+      title: "Vật nuôi",
+      dataIndex: "livestockId",
+      key: "livestockId",
+      width: 120,
+      render: (value) => (value ? <Tag>{livestockMap[value] || value}</Tag> : "-"),
     },
     {
       title: "Ưu tiên",
-      dataIndex: "priorityName",
+      dataIndex: "priority",
       key: "priority",
       width: 100,
-      render: (priorityName, record) => {
-        const color = priorityOptions.find(p => p.value === record.priority)?.color;
-        return <Tag color={color}>{priorityName}</Tag>;
+      render: (value) => {
+        const opt = priorityOptions.find(p => p.value === value);
+        return <Tag color={opt?.color}>{opt?.label || value}</Tag>;
       },
       filters: priorityOptions.map(opt => ({ text: opt.label, value: opt.value })),
       onFilter: (value, record) => record.priority === value,
-    },
-    {
-      title: "Tiến độ",
-      key: "progress",
-      width: 120,
-      render: (_, record) => (
-        <div>
-          <div style={{ marginBottom: 4, fontSize: '12px' }}>{record.progress}%</div>
-          <div style={{ width: 80 }}>
-            <Progress percent={record.progress} size="small" />
-          </div>
-        </div>
-      ),
-      sorter: (a, b) => a.progress - b.progress,
     },
     {
       title: "Hạn chót",
@@ -290,21 +179,11 @@ export const Tasks = () => {
       dataIndex: "status",
       key: "status",
       width: 120,
-      render: (status) => {
-        let color = "default";
-        let label = "";
-        if (status === "completed") { color = "success"; label = "Hoàn thành"; }
-        else if (status === "in-progress") { color = "processing"; label = "Đang làm"; }
-        else if (status === "overdue") { color = "error"; label = "Quá hạn"; }
-        else { color = "default"; label = "Chờ"; }
-        return <Tag color={color}>{label}</Tag>;
+      render: (value) => {
+        const opt = statusOptions.find((s) => s.value === value);
+        return <Tag color={opt?.color || "default"}>{opt?.label || value}</Tag>;
       },
-      filters: [
-        { text: "Chờ", value: "pending" },
-        { text: "Đang làm", value: "in-progress" },
-        { text: "Hoàn thành", value: "completed" },
-        { text: "Quá hạn", value: "overdue" }
-      ],
+      filters: statusOptions.map((s) => ({ text: s.label, value: s.value })),
       onFilter: (value, record) => record.status === value,
     },
     {
@@ -332,11 +211,10 @@ export const Tasks = () => {
     setSelectedRecord(record);
     form.setFieldsValue({  
       ...record,  
-      barn: record.barn,  
-      assignee: record.assignee,
       dueDate: dayjs(record.dueDate)
     });
-    setIsModalOpen(true);};
+    setIsModalOpen(true);
+  };
 
   const handleDelete = (record) => {
     Modal.confirm({
@@ -345,7 +223,7 @@ export const Tasks = () => {
       okText: "Xóa",
       okType: "danger",
       onOk() {
-        setData(data.filter(item => item.key !== record.key));
+        setData(data.filter(item => item._id !== record._id));
         message.success("Xóa công việc thành công!");
       },
     });
@@ -368,31 +246,24 @@ export const Tasks = () => {
       if (selectedRecord) {
         // Update
         setData(data.map(item => 
-          item.key === selectedRecord.key 
+          item._id === selectedRecord._id 
             ? { 
                 ...item, 
-                ...formattedValues, 
-                categoryName: categoryOptions.find(c => c.value === values.category)?.label || values.categoryName,
-                assigneeName: staffOptions.find(s => s.value === values.assignee)?.label || values.assigneeName,
-                barnName: barnOptions.find(b => b.value === values.barn)?.label || values.barnName,
-                priorityName: priorityOptions.find(p => p.value === values.priority)?.label || values.priorityName,
+                ...formattedValues,
+                updatedAt: new Date().toISOString(),
               } 
             : item
         ));
         message.success("Cập nhật công việc thành công!");
       } else {
         // Add new
-        const newKey = (parseInt(data[data.length - 1]?.key || "0") + 1).toString();
         const newItem = {
-          key: newKey,
-          id: `TK${String(data.length + 1).padStart(3, "0")}`,
+          _id: `task-${Date.now()}`,
+          code: `TK${String(data.length + 1).padStart(3, "0")}`,
           ...values,
-          categoryName: categoryOptions.find(c => c.value === values.category)?.label || values.category,
-          assigneeName: staffOptions.find(s => s.value === values.assignee)?.label || values.assigneeName,
-          barnName: barnOptions.find(b => b.value === values.barn)?.label || values.barnName,
-          priorityName: priorityOptions.find(p => p.value === values.priority)?.label || values.priorityName,
           status: "pending",
-          progress: 0
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         };
         setData([...data, newItem]);
         message.success("Thêm công việc mới thành công!");
@@ -460,6 +331,7 @@ export const Tasks = () => {
             }}
             scroll={{ x: 1600 }}
             className="tasks-table"
+            rowKey="_id"
           />
         </Card>
       </div>
@@ -503,28 +375,27 @@ export const Tasks = () => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item name="progress" label="Tiến độ">
-                <InputNumber min={0} max={100} style={{ width: '100%' }} />
+              <Form.Item name="code" label="Mã công việc" initialValue={selectedRecord?.code} rules={[{ required: true }]}>
+                <Input disabled={!!selectedRecord} />
               </Form.Item>
             </Col>
           </Row>
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="assignee" label="Người thực hiện" rules={[{ required: true }]}>
-                <Select placeholder="Chọn nhân viên">
-                  {staffOptions.map(option => (
-                    <Option key={option.value} value={option.value}>{option.label}</Option>
+              <Form.Item name="assigneeId" label="Người thực hiện">
+                <Select placeholder="Chọn nhân viên (Staff)">
+                  {initialStaffData.map((s) => (
+                    <Option key={s._id} value={s._id}>{`${s.code} - ${s.name}`}</Option>
                   ))}
                 </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="barn" label="Chuồng">
-                <Select placeholder="Chọn chuồng">
-                  <Option value="">Tất cả</Option>
-                  {barnOptions.map(option => (
-                    <Option key={option.value} value={option.value}>{option.label}</Option>
+              <Form.Item name="barnId" label="Chuồng">
+                <Select placeholder="Chọn chuồng (Barn)">
+                  {initialBarnsData.map((b) => (
+                    <Option key={b._id} value={b._id}>{`${b.code} - ${b.name}`}</Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -538,19 +409,26 @@ export const Tasks = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="status" label="Trạng thái" initialValue="pending">
+              <Form.Item name="status" label="Trạng thái" initialValue="pending" rules={[{ required: true }]}>
                 <Select>
-                  <Option value="pending">Chờ</Option>
-                  <Option value="in-progress">Đang làm</Option>
-                  <Option value="completed">Hoàn thành</Option>
-                  <Option value="overdue">Quá hạn</Option>
+                  {statusOptions.map((s) => (
+                    <Option key={s.value} value={s.value}>{s.label}</Option>
+                  ))}
                 </Select>
               </Form.Item>
             </Col>
           </Row>
 
           <Form.Item name="description" label="Mô tả">
-            <Input rows={3} placeholder="Chi tiết công việc..." />
+            <Input.TextArea rows={3} placeholder="Chi tiết công việc..." />
+          </Form.Item>
+
+          <Form.Item name="livestockId" label="Vật nuôi (tuỳ chọn)">
+            <Select allowClear placeholder="Chọn vật nuôi (Livestock)">
+              {initialLivestockData.map((l) => (
+                <Option key={l._id} value={l._id}>{`${l.tagCode} - ${l.name}`}</Option>
+              ))}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>

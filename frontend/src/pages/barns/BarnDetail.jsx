@@ -1,22 +1,34 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useMemo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { PageHeader } from "../../components/layout/PageHeader";
 
-import { Card, Row, Col, Tag, Descriptions, Button, Statistic, Divider, Image, Table } from 'antd';
-import { ArrowLeftOutlined, ProfileOutlined } from '@ant-design/icons';
+import { Button, Card, Col, Descriptions, Row, Statistic, Table, Tag } from "antd";
+import { ArrowLeftOutlined, ProfileOutlined } from "@ant-design/icons";
+import { initialBarnsData, initialLivestockData } from "../../data/mockData";
 
+const barnTypeLabel = {
+  cow: "Bò",
+  pig: "Lợn",
+  chicken: "Gà",
+};
 
-// Mock barn data
-const FAKE_BARNS_DATA = [
-{id: "A1", name: "Chuồng A1", type: "cattle", typeName: "Bò sữa", capacity: 50, currentCount: 20, occupancy: 40, cleanliness: "good", cleanlinessName: "Sạch sẽ", builtDate: "2023-01-15", size: "500m²", ventilation: "Tốt", location: "Khu A"},
-  {id: "B2", name: "Chuồng B2", type: "pig", typeName: "Lợn thịt", capacity: 120, currentCount: 80, occupancy: 67, cleanliness: "good", cleanlinessName: "Sạch sẽ", builtDate: "2023-06-20", size: "800m²", ventilation: "Tốt", location: "Khu B"},
-  {id: "C1", name: "Chuồng C1", type: "broiler", typeName: "Gà thịt", capacity: 5000, currentCount: 3200, occupancy: 64, cleanliness: "warning", cleanlinessName: "Cần vệ sinh", builtDate: "2024-01-10", size: "2000m²", ventilation: "Tự động", location: "Khu C"}
+const cleanlinessOptions = [
+  { value: "clean", label: "Sạch", color: "success" },
+  { value: "normal", label: "Bình thường", color: "warning" },
+  { value: "dirty", label: "Bẩn", color: "error" },
 ];
 
-// Mock assigned livestock for demo
-const ASSIGNED_LIVESTOCK = [
-  {id: "VN001", name: "Bò sữa 01", type: "cattle", weight: 450, health: "good"},
-  {id: "VN010", name: "Bò sữa 02", type: "cattle", weight: 420, health: "good"},
-];
+const healthLabel = {
+  healthy: "Khỏe mạnh",
+  sick: "Bệnh",
+  quarantine: "Cách ly",
+};
+
+const healthColor = {
+  healthy: "success",
+  sick: "error",
+  quarantine: "warning",
+};
 
 
 
@@ -24,35 +36,35 @@ export const BarnDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   
-  const barn = FAKE_BARNS_DATA.find(item => item.id === id);
+  const barn = initialBarnsData.find(item => item._id === id);
   if (!barn) return <div>Chuồng trại không tồn tại: {id}</div>;
+
+  const occupancy = barn.capacity ? Math.round(((barn.currentCount || 0) / barn.capacity) * 100) : 0;
+  const cleanliness = cleanlinessOptions.find((item) => item.value === barn.cleanliness);
+
+  const livestockInBarn = useMemo(
+    () => initialLivestockData.filter((item) => item.barnId === barn._id),
+    [barn._id]
+  );
   
-  const getBarnImageColor = (type) => {
-    const colors = {
-      'cattle': '4A90E2',
-      'pig': 'E94B3C', 
-      'broiler': 'F5AB35',
-      'layer': '7ED321',
-      'buffalo': '58595B'
-    };
-    return colors[type] || '4A90E2';
-  };
-
-  const imageUrl = 'https://via.placeholder.com/400x300/' + getBarnImageColor(barn.type) + '/FFFFFF?text=' + encodeURIComponent(barn.name);
-
   const livestockColumns = [
-    { title: 'Mã', dataIndex: 'id', key: 'id', width: 80 },
-    { title: 'Tên', dataIndex: 'name', key: 'name' },
-    { title: 'Loại', dataIndex: 'type', key: 'type', render: (type) => <Tag>{type}</Tag> },
-    { title: 'Cân nặng', dataIndex: 'weight', key: 'weight', render: (w) => `${w}kg` },
-    { title: 'Sức khỏe', dataIndex: 'health', key: 'health', render: (h) => <Tag color={h === 'good' ? 'success' : 'warning'}>{h}</Tag> }
+    { title: "Mã", dataIndex: "tagCode", key: "tagCode", width: 100 },
+    { title: "Tên", dataIndex: "name", key: "name" },
+    { title: "Loài", dataIndex: "type", key: "type", render: (type) => <Tag>{type}</Tag> },
+    { title: "Cân nặng", dataIndex: "weight", key: "weight", render: (w) => (w ? `${w} kg` : "-") },
+    {
+      title: "Sức khỏe",
+      dataIndex: "healthStatus",
+      key: "healthStatus",
+      render: (h) => <Tag color={healthColor[h]}>{healthLabel[h] || h}</Tag>,
+    },
   ];
 
   return (
     <div className="barn-detail">
       <PageHeader
-        title={'Chi tiết ' + barn.name}
-        subtitle={barn.typeName}
+        title={`Chi tiết ${barn.name}`}
+        subtitle={`${barn.code} • ${barnTypeLabel[barn.type] || barn.type}`}
         actions={[
           <Button key="back" icon={<ArrowLeftOutlined />} onClick={() => navigate('/barns')}>
             Danh sách
@@ -63,21 +75,12 @@ export const BarnDetail = () => {
       <Row gutter={24}>
         <Col xs={24} lg={8}>
           <Card>
-            <div className="barn-detail__image-container">
-              <Image
-                src={imageUrl}
-                fallback="https://via.placeholder.com/400x300/4A90E2/FFFFFF?text=Barn"
-                style={{ width: '100%', height: 300, objectFit: 'cover' }}
-              />
-            </div>
-            <Divider />
             <Descriptions column={1} size="small">
-              <Descriptions.Item label="Mã chuồng">{barn.id}</Descriptions.Item>
-              <Descriptions.Item label="Diện tích">{barn.size}</Descriptions.Item>
-              <Descriptions.Item label="Vị trí">{barn.location}</Descriptions.Item>
-              <Descriptions.Item label="Thông gió">{barn.ventilation}</Descriptions.Item>
-              <Descriptions.Item label="Ngày xây">{barn.builtDate}</Descriptions.Item>
-              <Descriptions.Item label="Ghi chú">Chuồng vận hành tốt</Descriptions.Item>
+              <Descriptions.Item label="Mã chuồng">{barn.code}</Descriptions.Item>
+              <Descriptions.Item label="Loại">{barnTypeLabel[barn.type] || barn.type}</Descriptions.Item>
+              <Descriptions.Item label="Sức chứa">{barn.capacity}</Descriptions.Item>
+              <Descriptions.Item label="Hiện tại">{barn.currentCount || 0}</Descriptions.Item>
+              <Descriptions.Item label="Trạng thái">{barn.status}</Descriptions.Item>
             </Descriptions>
           </Card>
         </Col>
@@ -87,7 +90,7 @@ export const BarnDetail = () => {
             <Col span={12}> 
               <Statistic   
                 title="Độ lấp đầy"   
-                value={barn.occupancy}   
+                value={occupancy}   
                 suffix="%"   precision={0}   
                 valueStyle={{ color: '#059669', fontSize: '2.5rem' }} 
                 />
@@ -95,7 +98,7 @@ export const BarnDetail = () => {
             <Col span={12}>             
               <Statistic      
                 title="Số vật nuôi"              
-                value={barn.currentCount}              
+                value={barn.currentCount || 0}              
                 suffix=" con"            
                 valueStyle={{ color: '#3B82F6', fontSize: '2.5rem' }}           
                 />
@@ -105,10 +108,10 @@ export const BarnDetail = () => {
           <Card style={{ marginTop: 16 }}>
             <Descriptions title="Thông tin chi tiết" column={2}>
               <Descriptions.Item label="Sức chứa">{barn.capacity} con</Descriptions.Item>
-              <Descriptions.Item label="Hiện tại">{barn.currentCount} con</Descriptions.Item>
+              <Descriptions.Item label="Hiện tại">{barn.currentCount || 0} con</Descriptions.Item>
               <Descriptions.Item label="Độ sạch">
-                <Tag color={barn.cleanliness === 'good' ? 'success' : barn.cleanliness === 'warning' ? 'warning' : 'error'}>
-                  {barn.cleanlinessName}
+                <Tag color={cleanliness?.color || "default"}>
+                  {cleanliness?.label || barn.cleanliness}
                 </Tag>
               </Descriptions.Item>
             </Descriptions>
@@ -120,13 +123,14 @@ export const BarnDetail = () => {
 
       <Row gutter={24} style={{ marginTop: 24 }}>
         <Col span={24}>
-          <Card title={<span><ProfileOutlined /> Vật nuôi trong chuồng ({ASSIGNED_LIVESTOCK.length} con)</span>}>
+          <Card title={<span><ProfileOutlined /> Vật nuôi trong chuồng ({livestockInBarn.length} con)</span>}>
             <Table 
               columns={livestockColumns} 
-              dataSource={ASSIGNED_LIVESTOCK} 
+              dataSource={livestockInBarn} 
               pagination={false}
               size="small"
               scroll={{ x: 600 }}
+              rowKey="_id"
             />
           </Card>
         </Col>

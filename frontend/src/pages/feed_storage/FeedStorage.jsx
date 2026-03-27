@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { PageHeader } from "../../components/layout/PageHeader";
-import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, InputNumber, DatePicker, Progress, message } from "antd";
+import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, InputNumber, DatePicker, message } from "antd";
 import {
   PlusOutlined,
   EditOutlined,
@@ -60,20 +60,16 @@ const statsData = [
   }
 ];
 
-// Type options matching pattern
+// Type options - backend enum
 const typeOptions = [
-  { value: "grass", label: "Cỏ" },
-  { value: "mixed", label: "Thức ăn hỗn hợp công nghiệp" },
-  { value: "fermented", label: "Thức ăn lên men" },
-  { value: "byproduct", label: "Phụ phẩm nông nghiệp" },
-  { value: "concentrate", label: "Thức ăn cô đặc" }
+  { value: "grain", label: "Ngũ cốc" },
+  { value: "supplement", label: "Bổ sung" },
 ];
 
-// Status options matching health/cleanliness pattern
+// Status options - backend enum
 const statusOptions = [
-  { value: "good", label: "Tốt", color: "success" },
-  { value: "warning", label: "Cảnh báo", color: "warning" },
-  { value: "critical", label: "Hết hạn", color: "error" }
+  { value: "available", label: "Còn hàng", color: "success" },
+  { value: "low", label: "Sắp hết", color: "warning" },
 ];
 
 // Shelf options
@@ -91,22 +87,23 @@ export const FeedStorage = () => {
   const [form] = Form.useForm();
   const [searchText, setSearchText] = useState("");
 
+  const typeMap = useMemo(() => Object.fromEntries(typeOptions.map((t) => [t.value, t.label])), []);
+
   // Filter data matching exact pattern (removed supplier)
   const filteredData = data.filter(item => 
     item.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.id.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.typeName.toLowerCase().includes(searchText.toLowerCase())
+    item.code.toLowerCase().includes(searchText.toLowerCase())
   );
 
   // Table columns matching exact pattern from Tasks/Barns/Livestock
   const columns = [
     {
       title: "Mã TA",
-      dataIndex: "id",
-      key: "id",
+      dataIndex: "code",
+      key: "code",
       width: 100,
       fixed: "left",
-      sorter: (a, b) => a.id.localeCompare(b.id),
+      sorter: (a, b) => a.code.localeCompare(b.code),
     },
     {
       title: "Tên thức ăn",
@@ -118,11 +115,12 @@ export const FeedStorage = () => {
     },
     {
       title: "Loại",
-      dataIndex: "typeName",
+      dataIndex: "type",
       key: "type",
       width: 120,
-      filters: typeOptions.map(opt => ({ text: opt.label, value: opt.label })),
-      onFilter: (value, record) => record.typeName === value,
+      filters: typeOptions.map(opt => ({ text: opt.label, value: opt.value })),
+      onFilter: (value, record) => record.type === value,
+      render: (value) => typeMap[value] || value,
     },
     {
       title: "Số lượng",
@@ -158,9 +156,10 @@ export const FeedStorage = () => {
 
     {
       title: "Phòng",
-      dataIndex: "roomName",
+      dataIndex: "room",
       key: "room",
       width: 100,
+      render: (v) => v || "-",
     },
     {
       title: "Thao tác",
@@ -170,7 +169,7 @@ export const FeedStorage = () => {
       render: (_, record) => (
         <Space size="small">
           <Tooltip title="Chi tiết">
-            <Button type="text" icon={<EyeOutlined />} onClick={() => window.location.href = `/feed/${record.id}`} />
+            <Button type="text" icon={<EyeOutlined />} onClick={() => (window.location.href = `/feed/${record._id}`)} />
           </Tooltip>
           <Tooltip title="Chỉnh sửa">
             <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
@@ -187,7 +186,6 @@ export const FeedStorage = () => {
     setSelectedRecord(record);
       form.setFieldsValue({  
         ...record,  
-        room: record.room,
         expiryDate: dayjs(record.expiryDate)
       });
     setIsModalOpen(true);
@@ -200,7 +198,7 @@ export const FeedStorage = () => {
       okText: "Xóa",
       okType: "danger",
       onOk() {
-        setData(data.filter(item => item.key !== record.key));
+        setData(data.filter(item => item._id !== record._id));
         message.success("Xóa thành công!");
       },
     });
@@ -220,26 +218,23 @@ export const FeedStorage = () => {
       };
       if (selectedRecord) {
         setData(data.map(item => 
-          item.key === selectedRecord.key 
+          item._id === selectedRecord._id 
             ? { 
                 ...item, 
                 ...formattedValues,
-                typeName: typeOptions.find(c => c.value === values.type)?.label || values.typeName,
-                roomName: roomOptions.find(b => b.value === values.room)?.label || values.roomName,
+                updatedAt: new Date().toISOString(),
               } 
             : item
         ));
         message.success("Cập nhật thành công!");
       } else {
-        const newKey = (parseInt(data[data.length - 1]?.key || "0") + 1).toString();
         const newItem = {
-          key: newKey,
-          id: `TA${String(data.length + 1).padStart(3, "0")}`,
+          _id: `feed-${Date.now()}`,
+          code: `TA${String(data.length + 1).padStart(3, "0")}`,
           ...formattedValues,
-          typeName: typeOptions.find(c => c.value === values.type)?.label || values.type,
-          roomName: roomOptions.find(b => b.value === values.room)?.label || values.room,
-          status: "good",
-          progress: 0
+          status: "available",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         };
         setData([...data, newItem]);
         message.success("Thêm mới thành công!");
@@ -305,6 +300,7 @@ export const FeedStorage = () => {
             }}
             scroll={{ x: 1600 }}
             className="feed-storage-table"
+            rowKey="_id"
           />
         </Card>
       </div>
@@ -323,6 +319,9 @@ export const FeedStorage = () => {
           layout="vertical"
           className="feed-storage-form"
         >
+          <Form.Item name="code" label="Mã thức ăn" rules={[{ required: true, message: "Vui lòng nhập mã!" }]}>
+            <Input placeholder="TA001" disabled={!!selectedRecord} />
+          </Form.Item>
           <Form.Item name="name" label="Tên thức ăn" rules={[{ required: true, message: "Vui lòng nhập tên!" }]}>
             <Input placeholder="Nhập tên thức ăn" />
           </Form.Item>
@@ -343,11 +342,10 @@ export const FeedStorage = () => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item name="unit" label="ĐVT" initialValue="kg">
+              <Form.Item name="unit" label="ĐVT" initialValue="kg" rules={[{ required: true }]}>
                 <Select>
                   <Option value="kg">kg</Option>
-                  <Option value="túi">túi</Option>
-                  <Option value="thùng">thùng</Option>
+                  <Option value="bag">bag</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -365,6 +363,11 @@ export const FeedStorage = () => {
                 </Select>
               </Form.Item>
             </Col>
+            <Col span={12}>
+              <Form.Item name="minQuantity" label="Tồn tối thiểu">
+                <InputNumber min={0} style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
           </Row>
 
           <Row gutter={16}>
@@ -374,7 +377,7 @@ export const FeedStorage = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="status" label="Trạng thái" initialValue="good">
+              <Form.Item name="status" label="Trạng thái" initialValue="available">
                 <Select>
                   {statusOptions.map(option => (
                     <Option key={option.value} value={option.value}>{option.label}</Option>
@@ -383,10 +386,6 @@ export const FeedStorage = () => {
               </Form.Item>
             </Col>
           </Row>
-
-          <Form.Item name="description" label="Ghi chú">
-            <Input.TextArea rows={3} placeholder="Thông tin bổ sung..." />
-          </Form.Item>
         </Form>
       </Modal>
     </div>

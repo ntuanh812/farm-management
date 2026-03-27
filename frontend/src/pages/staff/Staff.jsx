@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageHeader } from "../../components/layout/PageHeader";
-import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, InputNumber, message, DatePicker } from "antd";
+import { Card, Row, Col, Table, Button, Tag, Space, Tooltip, Modal, Form, Input, Select, message } from "antd";
 import { initialStaffData } from "../../data/mockData";
 import {
   PlusOutlined,
@@ -16,7 +16,6 @@ import {
 } from "@ant-design/icons";
 
 const { Option } = Select;
-const { RangePicker } = DatePicker;
 
 // Mock data for staff
 
@@ -61,16 +60,15 @@ const statsData = [
   }
 ];
 const roleOptions = [
-  { value: "veterinarian", label: "Thú y" },
-  { value: "cleaner", label: "Vệ sinh" },
-  { value: "livestock", label: "Chăn nuôi" }
+  { value: "manager", label: "Quản lý" },
+  { value: "worker", label: "Nhân công" },
+  { value: "vet", label: "Thú y" },
 ];
 
 // Status options
 const statusOptions = [
   { value: "active", label: "Đang làm", color: "success" },
-  { value: "leave", label: "Nghỉ phép", color: "warning" },
-  { value: "trial", label: "Thử việc", color: "blue" }
+  { value: "inactive", label: "Ngừng làm", color: "default" },
 ];
 
 
@@ -85,19 +83,19 @@ export const Staff = () => {
   // Filter data based on search
   const filteredData = data.filter(item => 
     item.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.id.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.roleName.toLowerCase().includes(searchText.toLowerCase())
+    item.code.toLowerCase().includes(searchText.toLowerCase()) ||
+    item.role.toLowerCase().includes(searchText.toLowerCase())
   );
 
   // Table columns
   const columns = [
     {
       title: "Mã NV",
-      dataIndex: "id",
-      key: "id",
+      dataIndex: "code",
+      key: "code",
       width: 100,
       fixed: "left",
-      sorter: (a, b) => a.id.localeCompare(b.id),
+      sorter: (a, b) => a.code.localeCompare(b.code),
     },
     {
       title: "Tên nhân viên",
@@ -108,11 +106,12 @@ export const Staff = () => {
     },
     {
       title: "Vai trò",
-      dataIndex: "roleName",
+      dataIndex: "role",
       key: "role",
       width: 120,
-      filters: roleOptions.map(opt => ({ text: opt.label, value: opt.label })),
-      onFilter: (value, record) => record.roleName === value,
+      filters: roleOptions.map(opt => ({ text: opt.label, value: opt.value })),
+      onFilter: (value, record) => record.role === value,
+      render: (value) => roleOptions.find((opt) => opt.value === value)?.label || value,
     },
     {
       title: "SĐT",
@@ -121,11 +120,10 @@ export const Staff = () => {
       width: 120,
     },
     {
-      title: "Ngày vào",
-      dataIndex: "hireDate",
-      key: "hireDate",
-      width: 120,
-      sorter: (a, b) => new Date(a.hireDate) - new Date(b.hireDate),
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      width: 220,
     },
     {
       title: "Trạng thái",
@@ -150,7 +148,7 @@ export const Staff = () => {
             <Button 
               type="text" 
               icon={<EyeOutlined />} 
-              onClick={() => navigate(`/staff/${record.id}`)}
+              onClick={() => navigate(`/staff/${record._id}`)}
               className="action-btn action-btn--view"
             />
           </Tooltip>
@@ -189,7 +187,7 @@ export const Staff = () => {
       okType: "danger",
       cancelText: "Hủy",
       onOk() {
-        setData(data.filter(item => item.key !== record.key));
+        setData(data.filter(item => item._id !== record._id));
         message.success("Xóa nhân viên thành công!");
       },
     });
@@ -206,24 +204,19 @@ export const Staff = () => {
       if (selectedRecord) {
         // Update
         setData(data.map(item => 
-          item.key === selectedRecord.key 
+          item._id === selectedRecord._id 
             ? { 
                 ...item, 
                 ...values,
-                roleName: roleOptions.find(r => r.value === values.role)?.label || values.roleName,
-  
               } 
             : item
         ));
         message.success("Cập nhật nhân viên thành công!");
       } else {
         // Add new
-        const newKey = (parseInt(data[data.length - 1]?.key || "0") + 1).toString();
         const newItem = {
-          key: newKey,
-          id: `NV${String(data.length + 1).padStart(3, "0")}`,
+          _id: `staff-${Date.now()}`,
           ...values,
-          roleName: roleOptions.find(r => r.value === values.role)?.label || values.role,
           status: "active"
         };
         setData([...data, newItem]);
@@ -292,6 +285,7 @@ export const Staff = () => {
             }}
             scroll={{ x: 1400 }}
             className="staff-table"
+            rowKey="_id"
           />
         </Card>
       </div>
@@ -329,8 +323,8 @@ export const Staff = () => {
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="hireDate" label="Ngày vào làm" rules={[{ required: true }]}>
-                <Input type="date" style={{ width: "100%" }} />
+              <Form.Item name="code" label="Mã nhân viên" rules={[{ required: true }]}>
+                <Input placeholder="NV001" disabled={!!selectedRecord} />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -343,6 +337,10 @@ export const Staff = () => {
               </Form.Item>
             </Col>
           </Row>
+
+          <Form.Item name="email" label="Email">
+            <Input placeholder="email@domain.com" />
+          </Form.Item>
 
           <Form.Item name="address" label="Địa chỉ">
             <Input.TextArea rows={3} placeholder="Nhập địa chỉ thường trú" />
