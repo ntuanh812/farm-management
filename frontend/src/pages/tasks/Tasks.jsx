@@ -314,9 +314,6 @@ export const Tasks = () => {
       fixed: "right",
       render: (_, record) => (
         <Space size="small">
-          <Tooltip title="Chi tiết">
-            <Button type="text" icon={<EyeOutlined />} />
-          </Tooltip>
           <Tooltip title="Chỉnh sửa">
             <Button type="text" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
           </Tooltip>
@@ -332,7 +329,6 @@ export const Tasks = () => {
 // Removed unused navigate
 
   const handleEdit = (record) => {
-    console.log('Edit clicked:', record);
     setSelectedRecord(record);
     form.setFieldsValue({  
       ...record,  

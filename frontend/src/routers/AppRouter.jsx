@@ -15,6 +15,7 @@ import { Tasks } from "../pages/tasks/Tasks";
 import { FeedStorage } from "../pages/feed_storage/FeedStorage";
 import { FeedStorageDetail } from "../pages/feed_storage/FeedStorageDetail";
 
+
 export const AppRouter = () => {
     return(
         <Routes>
@@ -35,6 +36,8 @@ export const AppRouter = () => {
                 <Route path="/tasks" element={<Tasks />} />
                 <Route path="/feed" element={<FeedStorage />} />
                 <Route path="/feed/:id" element={<FeedStorageDetail />} />
+                
+
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

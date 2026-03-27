@@ -10,8 +10,6 @@ const menuItems = [
   { key: '/staff', label: 'Nhân sự trang trại', icon: <TeamOutlined /> },
   { key: '/tasks', label: 'Công việc đang giao', icon: <FileDoneOutlined /> },
   { key: '/feed', label: 'Kho thức ăn', icon: <ShoppingCartOutlined /> },
-  { key: '/reports', label: 'Báo cáo & Thống kê', icon: <ExperimentOutlined /> },
-  { key: '/settings', label: 'Cài đặt hệ thống', icon: <SettingOutlined /> },
 ];
 
 export const Sidebar = () => {
