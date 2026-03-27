@@ -554,7 +554,7 @@ export const Tasks = () => {
           </Row>
 
           <Form.Item name="description" label="Mô tả">
-            <Input.TextArea rows={3} placeholder="Chi tiết công việc..." />
+            <Input rows={3} placeholder="Chi tiết công việc..." />
           </Form.Item>
         </Form>
       </Modal>

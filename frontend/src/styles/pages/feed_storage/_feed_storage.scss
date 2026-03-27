@@ -1,0 +1,207 @@
+// FeedStorage - Warehouse Theme (matching Tasks/Barns vibe exactly)
+@use "sass:color";
+@use "../../base/variables" as *;
+@use "./variables" as *;
+@use "../../components/ui/cards" as cards;
+
+.feed-storage {
+  &__content {
+    padding: 24px;
+    background: linear-gradient(180deg, $feed-cream 0%, #f0ebe0 100%);
+    min-height: calc(100vh - 140px);
+  }
+
+  &-stats {
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    @include cards.farm-card;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, $feed-primary, $feed-secondary);
+    }
+
+    &--total {
+      &::before { background: linear-gradient(90deg, $feed-primary, $feed-secondary); }
+      .stat-card__icon { @include cards.stat-icon($feed-primary); }
+    }
+
+    &--avg-stock {
+      &::before { background: linear-gradient(90deg, #4CAF50, #66BB6A); }
+      .stat-card__icon { @include cards.stat-icon(#4CAF50); }
+    }
+
+    &--expiring {
+      &::before { background: linear-gradient(90deg, $feed-critical, color.scale($feed-critical, $lightness: -10%)); }
+      .stat-card__icon { @include cards.stat-icon($feed-critical); }
+    }
+
+    &--new {
+      &::before { background: linear-gradient(90deg, #FF9800, #FFB74D); }
+      .stat-card__icon { @include cards.stat-icon(#FF9800); }
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    &__title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #5a6c5a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    &__value {
+      font-size: 32px;
+      font-weight: 700;
+      color: $feed-primary;
+      margin-bottom: 4px;
+    }
+
+    &__label {
+      font-size: 13px;
+      color: #7a8c7a;
+    }
+
+    &__trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 20px;
+      margin-top: 8px;
+
+      &--up {
+        background: rgba(76, 175, 80, 0.15);
+        color: #059669;
+      }
+
+      &--down {
+        background: rgba(239, 68, 68, 0.15);
+        color: #dc2626;
+      }
+    }
+  }
+
+  .table-card {
+    @include cards.farm-card;
+    padding: 0;
+
+    &__header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(76, 175, 80, 0.1);
+
+      h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: $feed-primary;
+        margin: 0;
+      }
+    }
+  }
+
+  &-table {
+    .ant-table-thead > tr > th {
+      background: rgba(76, 175, 80, 0.05);
+      color: $feed-primary;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(76, 175, 80, 0.1);
+    }
+
+    .ant-table-tbody > tr:hover > td {
+      background: rgba(76, 175, 80, 0.04);
+    }
+
+    .action-btn {
+      &--view { color: $feed-secondary; &:hover { color: $feed-primary; background: rgba(76, 175, 80, 0.1); } }
+      &--edit { color: #f59e0b; &:hover { color: #d97706; background: rgba(245, 158, 11, 0.1); } }
+      &--delete { color: $feed-critical; &:hover { color: #dc2626; background: rgba(239, 68, 68, 0.1); } }
+    }
+  }
+
+  &-form {
+    .ant-form-item-label > label {
+      color: $feed-primary;
+      font-weight: 500;
+    }
+
+    .ant-input,
+    .ant-select-selector,
+    .ant-picker,
+    .ant-input-number-input {
+      border-radius: 8px;
+      &:hover { border-color: $feed-primary; }
+    }
+
+    .ant-input:focus,
+    .ant-select-focused .ant-select-selector,
+    .ant-picker-focused .ant-picker,
+    .ant-input-number:focus {
+      border-color: $feed-primary;
+      box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+    }
+
+    .ant-form-item-has-error .ant-input,
+    .ant-form-item-has-error .ant-select-selector,
+    .ant-form-item-has-error .ant-picker {
+      border-color: $feed-critical !important;
+    }
+  }
+}
+
+// Animation matching pattern
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stat-card {
+  animation: slideUp 0.5s ease forwards;
+  opacity: 0;
+
+  @for $i from 1 through 4 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.1}s;
+    }
+  }
+}
+
+// Detail page styles
+.feed-storage-detail {
+  .ant-statistic {
+    .ant-statistic-content {
+      text-align: center;
+    }
+  }
+}
+
+// Antd overrides matching pattern
+.ant-card.table-card {
+  border-radius: 16px;
+  border: none;
+  box-shadow: none;
+}
+
+.ant-modal .ant-modal-header {
+  border-bottom: 1px solid rgba(76, 175, 80, 0.1);
+  .ant-modal-title { color: $feed-primary; font-weight: 600; }
+}

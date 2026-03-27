@@ -12,6 +12,8 @@ import { BarnDetail } from "../pages/barns/BarnDetail";
 import { Staff } from "../pages/staff/Staff";
 import { StaffDetail } from "../pages/staff/StaffDetail";
 import { Tasks } from "../pages/tasks/Tasks";
+import { FeedStorage } from "../pages/feed_storage/FeedStorage";
+import { FeedStorageDetail } from "../pages/feed_storage/FeedStorageDetail";
 
 export const AppRouter = () => {
     return(
@@ -31,6 +33,8 @@ export const AppRouter = () => {
                 <Route path="/staff" element={<Staff />} />
                 <Route path="/staff/:id" element={<StaffDetail />} />
                 <Route path="/tasks" element={<Tasks />} />
+                <Route path="/feed" element={<FeedStorage />} />
+                <Route path="/feed/:id" element={<FeedStorageDetail />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />
