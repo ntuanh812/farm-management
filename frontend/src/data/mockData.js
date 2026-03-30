@@ -250,12 +250,24 @@ export const initialVaccinationsData = [
     _id: "vaccination-1",
     livestockId: "livestock-3",
     vaccineName: "FMD",
-    vaccinationDate: "2026-03-15",
+    vaccinationDate: "2026-03-15T00:00:00",
     staffId: "staff-2",
-    notes: "",
+    notes: "Tiêm định kỳ",
     status: "done",
-    createdAt: "2026-03-15",
-    updatedAt: "2026-03-15",
+    createdAt: "2026-03-15T00:00:00",
+    updatedAt: "2026-03-15T00:00:00",
+  },
+
+  {
+    _id: "vaccination-2",
+    livestockId: "livestock-3",
+    vaccineName: "Tụ huyết trùng",
+    vaccinationDate: "2026-04-15T00:00:00",
+    staffId: "staff-1",
+    notes: "Lịch tiêm tiếp theo",
+    status: "scheduled",
+    createdAt: "2026-03-20T00:00:00",
+    updatedAt: "2026-03-20T00:00:00",
   },
 ];
 
@@ -276,4 +288,35 @@ export const activities = [
     entityId: "task-2",
     createdAt: "2026-03-27T08:30:00.000Z",
   },
+];
+
+export const initialVaccinationData = [
+{
+_id:"1",
+livestockId:"1",
+vaccine:"Lở mồm long móng",
+date:"2025-03-20",
+note:"Tiêm định kỳ"
+}
+]
+
+export const weightHistoryData = [
+{
+_id:"w1",
+livestockId:"livestock-3",
+weight:120,
+date:"2026-01-01"
+},
+{
+_id:"w2",
+livestockId:"livestock-3",
+weight:140,
+date:"2026-02-01"
+},
+{
+_id:"w3",
+livestockId:"livestock-3",
+weight:160,
+date:"2026-03-01"
+}
 ];

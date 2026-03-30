@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { HomeOutlined, ProfileOutlined, OrderedListOutlined, ProductOutlined, SettingOutlined, LogoutOutlined, TeamOutlined, ShoppingCartOutlined, FileDoneOutlined, ExperimentOutlined } from '@ant-design/icons';
+import { HomeOutlined, ProfileOutlined, OrderedListOutlined, ProductOutlined, LogoutOutlined, TeamOutlined, ShoppingCartOutlined, FileDoneOutlined, ExperimentOutlined } from '@ant-design/icons';
 import { Menu, Button } from 'antd';
 
 const menuItems = [

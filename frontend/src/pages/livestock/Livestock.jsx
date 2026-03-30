@@ -160,20 +160,10 @@ export const Livestock = () => {
       title: "Loại",
       render: (_, record) => (
         <Tag>
-          {categoryOptions.find((i) => i.value === record.category)?.label}/
-          {typeOptions.find((i) => i.value === record.type)?.label}
+          {categoryOptions.find((i) => i.value === record.category)?.label}
+
         </Tag>
       ),
-    },
-    {
-      title: "Sản xuất",
-      dataIndex: "productionType",
-      render: (items) =>
-        items?.map((item) => (
-          <Tag key={item}>
-            {productionTypeOptions.find((i) => i.value === item)?.label}
-          </Tag>
-        )),
     },
     {
       title: "Sức khỏe",
@@ -194,6 +184,11 @@ export const Livestock = () => {
       title: "Cân nặng",
       dataIndex: "weight",
       render: (value) => (value ? `${value} kg` : "-"),
+    },
+    {
+      title: "Ghi chú",
+      dataIndex: "notes",
+      render: (value) => value || "-",
     },
     {
       title: "Thao tác",
@@ -384,109 +379,165 @@ export const Livestock = () => {
       </div>
 
       <Modal
-        title={
-          selectedRecord
-            ? "Chỉnh sửa vật nuôi"
-            : "Thêm vật nuôi"
-        }
-        open={isModalOpen}
-        onOk={handleModalOk}
-        onCancel={() => setIsModalOpen(false)}
-        width={600}
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="name"
-            label="Tên"
-            rules={[{ required: true }]}
-          >
-            <Input />
-          </Form.Item>
+  title={selectedRecord ? "Chỉnh sửa vật nuôi" : "Thêm vật nuôi"}
+  open={isModalOpen}
+  onOk={handleModalOk}
+  onCancel={() => setIsModalOpen(false)}
+  okText={selectedRecord ? "Lưu" : "Thêm mới"}
+  cancelText="Hủy"
+  width={600}
+>
+  <Form form={form} layout="vertical" className="livestock-form">
+    
+    <Row gutter={16}>
+      <Col span={12}>
+        <Form.Item
+          name="tagCode"
+          label="Mã vật nuôi"
+          rules={[{ required: true }]}
+        >
+          <Input placeholder="Nhập mã vật nuôi" />
+        </Form.Item>
+      </Col>
 
-          <Form.Item
-            name="tagCode"
-            label="Mã vật nuôi"
-            rules={[{ required: true }]}
-          >
-            <Input />
-          </Form.Item>
+      <Col span={12}>
+        <Form.Item
+          name="name"
+          label="Tên vật nuôi"
+          rules={[{ required: true }]}
+        >
+          <Input placeholder="Nhập tên vật nuôi" />
+        </Form.Item>
+      </Col>
+    </Row>
 
-          <Form.Item
-            name="category"
-            label="Nhóm"
-            rules={[{ required: true }]}
-          >
-            <Select options={categoryOptions} />
-          </Form.Item>
+    <Row gutter={16}>
+      <Col span={12}>
+        <Form.Item
+          name="category"
+          label="Nhóm"
+          rules={[{ required: true }]}
+        >
+          <Select placeholder="Chọn nhóm">
+            {categoryOptions.map(option => (
+              <Option key={option.value} value={option.value}>
+                {option.label}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+      </Col>
 
-          <Form.Item
-            name="type"
-            label="Loại"
-            rules={[{ required: true }]}
-          >
-            <Select options={typeOptions} />
-          </Form.Item>
+      <Col span={12}>
+        <Form.Item
+          name="type"
+          label="Loại"
+          rules={[{ required: true }]}
+        >
+          <Select placeholder="Chọn loại">
+            {typeOptions.map(option => (
+              <Option key={option.value} value={option.value}>
+                {option.label}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+      </Col>
+    </Row>
 
-          <Form.Item
-            name="productionType"
-            label="Hướng sản xuất"
-            rules={[{ required: true }]}
-          >
-            <Select
-              mode="multiple"
-              options={productionTypeOptions}
-            />
-          </Form.Item>
+    <Row gutter={16}>
+      <Col span={12}>
+        <Form.Item
+          name="productionType"
+          label="Hướng sản xuất"
+          rules={[{ required: true }]}
+        >
+          <Select mode="multiple" placeholder="Chọn hướng sản xuất">
+            {productionTypeOptions.map(option => (
+              <Option key={option.value} value={option.value}>
+                {option.label}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+      </Col>
 
-          <Form.Item name="healthStatus" label="Sức khỏe">
-            <Select
-              options={healthStatusOptions.map((item) => ({
-                value: item.value,
-                label: item.label,
-              }))}
-            />
-          </Form.Item>
+      <Col span={12}>
+        <Form.Item name="healthStatus" label="Sức khỏe">
+          <Select placeholder="Chọn trạng thái">
+            {healthStatusOptions.map(option => (
+              <Option key={option.value} value={option.value}>
+                {option.label}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+      </Col>
+    </Row>
 
-          <Form.Item
-            name="barnId"
-            label="Chuồng"
-            rules={[{ required: true }]}
-          >
-            <Select
-              options={initialBarnsData.map((barn) => ({
-                value: barn._id,
-                label: `${barn.code} - ${barn.name}`,
-              }))}
-            />
-          </Form.Item>
+    <Row gutter={16}>
+      <Col span={12}>
+        <Form.Item
+          name="barnId"
+          label="Chuồng"
+          rules={[{ required: true }]}
+        >
+          <Select placeholder="Chọn chuồng">
+            {initialBarnsData.map(barn => (
+              <Option key={barn._id} value={barn._id}>
+                {barn.code} - {barn.name}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+      </Col>
 
-          <Form.Item name="weight" label="Cân nặng">
-            <InputNumber
-              style={{ width: "100%" }}
-              min={0}
-            />
-          </Form.Item>
+      <Col span={12}>
+        <Form.Item name="weight" label="Cân nặng (kg)">
+          <InputNumber
+            min={0}
+            style={{ width: "100%" }}
+            placeholder="Nhập cân nặng"
+          />
+        </Form.Item>
+      </Col>
+    </Row>
 
-          <Form.Item name="quantity" label="Số lượng">
-            <InputNumber
-              style={{ width: "100%" }}
-              min={1}
-            />
-          </Form.Item>
+    <Row gutter={16}>
+      <Col span={12}>
+        <Form.Item name="quantity" label="Số lượng">
+          <InputNumber
+            min={1}
+            style={{ width: "100%" }}
+            placeholder="Nhập số lượng"
+          />
+        </Form.Item>
+      </Col>
 
-          <Form.Item
-            name="status"
-            label="Trạng thái"
-            rules={[{ required: true }]}
-          >
-            <Select options={statusOptions} />
-          </Form.Item>
+      <Col span={12}>
+        <Form.Item
+          name="status"
+          label="Trạng thái"
+          rules={[{ required: true }]}
+          initialValue="active"
+        >
+          <Select placeholder="Chọn trạng thái">
+            {statusOptions.map(option => (
+              <Option key={option.value} value={option.value}>
+                {option.label}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+      </Col>
+    </Row>
 
-          <Form.Item name="notes" label="Ghi chú">
-            <Input.TextArea rows={3} />
-          </Form.Item>
-        </Form>
-      </Modal>
+    <Form.Item name="notes" label="Ghi chú">
+      <Input.TextArea rows={3} placeholder="Nhập ghi chú..." />
+    </Form.Item>
+
+  </Form>
+</Modal>
     </div>
   );
 };

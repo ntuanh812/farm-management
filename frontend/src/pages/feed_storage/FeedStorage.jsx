@@ -251,7 +251,7 @@ export const FeedStorage = () => {
         subtitle="Quản lý tồn kho và hạn sử dụng thức ăn chăn nuôi"
         actions={
           <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-            Thêm loại thức ăn mới
+            Thêm thức ăn mới
           </Button>
         }
       />
