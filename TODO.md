@@ -1,13 +1,9 @@
-# Sidebar CHỐT ✅
+# Trang Danh sách lợn HOÀN THÀNH ✅
 
-Cấu trúc cuối cùng đã implement:
-- 🏠 Tổng quan
-- 🐖 Quản lý đàn: Danh sách lợn, Chuyển chuồng, Ghi nhận chết, Xuất / bán
-- 🐷 Sinh sản: Phối giống, Mang thai, Đẻ con, Cai sữa  
-- 🍽️ Chăn nuôi: Sử dụng cám, Theo dõi trọng lượng
-- 💊 Thú y: Sử dụng thuốc, Tiêm phòng
-- 📦 Kho: Kho thức ăn
-- 📊 Báo cáo: Nhập / xuất, Tăng trưởng, Sinh sản
-- ⚙️ Hệ thống: Nhân sự, Công việc
+- [x] Livestock.jsx với Antd Table + filter/mock data
+- [x] Styles (_livestock.scss + index/variables)
+- [x] Route AppRouter + style.scss @use
+- [x] Fix ESLint + action buttons (console.log onClick cho Sửa/Xóa)
+- [x] Vite HMR test OK
 
-Server đang chạy. Task hoàn thành.
+Navigate sidebar "Danh sách lợn" để dùng. Backend mock ready.

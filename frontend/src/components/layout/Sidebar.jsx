@@ -12,10 +12,10 @@ const menuItems = [
     key: '/manage',
     label: '🐖 Quản lý đàn',
     children: [
-      { key: '/livestock', label: 'Danh sách lợn', icon: <ProfileOutlined /> },
-      { key: '/livestock/transfer', label: 'Chuyển chuồng', icon: <SwapRightOutlined /> },
-      { key: '/livestock/death', label: 'Ghi nhận chết', icon: <CloseCircleOutlined /> },
-      { key: '/livestock/sale', label: 'Xuất / bán', icon: <DollarCircleOutlined /> },
+      { key: '/pigmanage', label: 'Danh sách lợn', icon: <ProfileOutlined /> },
+      { key: '/pigmanage/transfer', label: 'Chuyển chuồng', icon: <SwapRightOutlined /> },
+      { key: '/pigmanage/death', label: 'Ghi nhận chết', icon: <CloseCircleOutlined /> },
+      { key: '/pigmanage/sale', label: 'Xuất / bán', icon: <DollarCircleOutlined /> },
     ]
   },
   { 
