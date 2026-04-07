@@ -1,23 +1,80 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { HomeOutlined, ProfileOutlined, OrderedListOutlined, ProductOutlined, LogoutOutlined, TeamOutlined, ShoppingCartOutlined, FileDoneOutlined, ExperimentOutlined } from '@ant-design/icons';
+import { ProfileOutlined, LogoutOutlined, TeamOutlined, FileDoneOutlined, HeartOutlined, UsergroupAddOutlined, SwapOutlined, MedicineBoxOutlined, LineChartOutlined, SwapRightOutlined, DollarCircleOutlined, CloseCircleOutlined, IdcardOutlined, CalendarOutlined, ClockCircleOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { Menu, Button } from 'antd';
 
 const menuItems = [
-  { key: '/dashboard', label: 'Bảng tổng quát', icon: <HomeOutlined /> },
-  { key: '/livestock', label: 'Danh sách vật nuôi', icon: <ProfileOutlined /> },
-  { key: '/barns', label: 'Danh sách chuồng trại', icon: <OrderedListOutlined /> },
-  { key: '/staff', label: 'Nhân sự trang trại', icon: <TeamOutlined /> },
-  { key: '/tasks', label: 'Công việc đang giao', icon: <FileDoneOutlined /> },
-  { key: '/feed', label: 'Kho thức ăn', icon: <ShoppingCartOutlined /> },
+  { 
+    key: '/dashboard', 
+    label: '🏠 Tổng quan',  
+  },
+  {
+    key: '/manage',
+    label: '🐖 Quản lý đàn',
+    children: [
+      { key: '/livestock', label: 'Danh sách lợn', icon: <ProfileOutlined /> },
+      { key: '/livestock/transfer', label: 'Chuyển chuồng', icon: <SwapRightOutlined /> },
+      { key: '/livestock/death', label: 'Ghi nhận chết', icon: <CloseCircleOutlined /> },
+      { key: '/livestock/sale', label: 'Xuất / bán', icon: <DollarCircleOutlined /> },
+    ]
+  },
+  { 
+    key: '/breeding',
+    label: '🐷 Sinh sản',
+    children: [
+      { key: '/breeding/mating', label: 'Phối giống', icon: <HeartOutlined /> },
+      { key: '/breeding/pregnancy', label: 'Mang thai', icon: <CalendarOutlined /> },
+      { key: '/breeding/farrowing', label: 'Đẻ con', icon: <UsergroupAddOutlined /> },
+      { key: '/breeding/weaning', label: 'Cai sữa', icon: <SwapOutlined /> },
+    ]
+  },
+  { 
+    key: '/feed',
+    label: '🍽️ Chăn nuôi',
+    children: [
+      { key: '/feed/usage', label: 'Sử dụng cám', icon: <ShoppingCartOutlined /> },
+      { key: '/livestock/weight', label: 'Theo dõi trọng lượng', icon: <LineChartOutlined /> },
+    ]
+  },
+  { 
+    key: '/veterinary',
+    label: '💊 Thú y',
+    children: [
+      { key: '/vaccination/usage', label: 'Sử dụng thuốc', icon: <MedicineBoxOutlined /> },
+      { key: '/vaccination/schedule-vaccine', label: 'Tiêm phòng', icon: <ClockCircleOutlined /> },
+    ]
+  },
+  { 
+    key: '/warehouse',
+    label: '📦 Kho',
+    children: [
+      { key: '/feed-storage', label: 'Kho thức ăn', icon: <ShoppingCartOutlined /> },
+    ]
+  },
+  { 
+    key: '/reports',
+    label: '📊 Báo cáo',
+    children: [
+      { key: '/reports/in-out', label: 'Nhập / xuất', icon: <SwapOutlined /> },
+      { key: '/reports/growth', label: 'Tăng trưởng', icon: <LineChartOutlined /> },
+      { key: '/reports/breeding', label: 'Sinh sản', icon: <HeartOutlined /> },
+    ]
+  },
+  { 
+    key: '/system',
+    label: '⚙️ Hệ thống',
+    children: [
+      { key: '/staff', label: 'Nhân sự', icon: <TeamOutlined /> },
+      { key: '/tasks', label: 'Công việc', icon: <FileDoneOutlined /> },
+    ]
+  },
 ];
 
 export const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Find the currently selected key based on the current path
-  const getSelectedKey = () => location.pathname || '/dashboard';
+  const getSelectedKey = () => location.pathname ? [location.pathname] : ['/dashboard'];
 
   const onClick = (e) => {
     if (e.key) {
@@ -39,16 +96,14 @@ export const Sidebar = () => {
         </div>
       </div>
 
-      {/* Menu */}
       <Menu
         onClick={onClick}
         style={{ width: 256 }}
-        selectedKeys={[getSelectedKey()]}
+        selectedKeys={getSelectedKey()}
         mode="inline"
         items={menuItems}
       />
 
-      {/* Footer */}
       <div className="sidebar__footer">
         <Button
           type="text"
@@ -63,4 +118,3 @@ export const Sidebar = () => {
     </div>
   );
 };
-
