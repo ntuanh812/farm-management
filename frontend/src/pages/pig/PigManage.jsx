@@ -27,22 +27,18 @@ const typeMap = {
 
 // ===== TRẠNG THÁI =====
 const statusList = [
-  "Hậu bị",
   "Đã phối",
   "Đẻ con",
   "Cai sữa",
-  "Động dục lại",
   "Sảy thai",
   "Bán loại",
   "Chết",
 ];
 
 const statusColor = {
-  "Hậu bị": "blue",
   "Đã phối": "purple",
   "Đẻ con": "green",
   "Cai sữa": "cyan",
-  "Động dục lại": "orange",
   "Sảy thai": "red",
   "Bán loại": "volcano",
   "Chết": "black",
@@ -193,6 +189,8 @@ export default function PigManagement() {
         <Col span={8}><Card><h3>Tổng đàn</h3><h1>{dataSource.length}</h1></Card></Col>
         <Col span={8}><Card><h3>Lợn nái</h3><h1>{dataSource.filter(p=>p.type==="sow").length}</h1></Card></Col>
         <Col span={8}><Card><h3>Lợn thịt</h3><h1>{dataSource.filter(p=>p.type==="fattening").length}</h1></Card></Col>
+        <Col span={8}><Card><h3>Lợn con</h3><h1>{dataSource.filter(p=>p.type==="piglet").length}</h1></Card></Col>
+        <Col span={8}><Card><h3>Lợn đực</h3><h1>{dataSource.filter(p=>p.type==="boar").length}</h1></Card></Col>
       </Row>
 
       {/* FILTER */}

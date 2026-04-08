@@ -9,17 +9,17 @@ const menuItems = [
     label: '🏠 Tổng quan',  
   },
   {
-    key: '/manage',
+    key: 'pigmanage',
     label: '🐖 Quản lý đàn',
     children: [
       { key: '/pigmanage', label: 'Danh sách lợn', icon: <ProfileOutlined /> },
-      { key: '/pigmanage/transfer', label: 'Chuyển chuồng', icon: <SwapRightOutlined /> },
-      { key: '/pigmanage/death', label: 'Ghi nhận chết', icon: <CloseCircleOutlined /> },
-      { key: '/pigmanage/sale', label: 'Xuất / bán', icon: <DollarCircleOutlined /> },
+      { key: '/pigmanage/pigsty-history', label: 'Chuyển chuồng', icon: <SwapRightOutlined /> },
+      { key: '/pigmanage/pig-dead', label: 'Ghi nhận chết', icon: <CloseCircleOutlined /> },
+      { key: '/pigmanage/pig-sell', label: 'Xuất / bán', icon: <DollarCircleOutlined /> },
     ]
   },
   { 
-    key: '/breeding',
+    key: 'breeding',
     label: '🐷 Sinh sản',
     children: [
       { key: '/breeding/mating', label: 'Phối giống', icon: <HeartOutlined /> },
@@ -29,7 +29,7 @@ const menuItems = [
     ]
   },
   { 
-    key: '/feed',
+    key: 'feed',
     label: '🍽️ Chăn nuôi',
     children: [
       { key: '/feed/usage', label: 'Sử dụng cám', icon: <ShoppingCartOutlined /> },
@@ -37,7 +37,7 @@ const menuItems = [
     ]
   },
   { 
-    key: '/veterinary',
+    key: 'veterinary',
     label: '💊 Thú y',
     children: [
       { key: '/vaccination/usage', label: 'Sử dụng thuốc', icon: <MedicineBoxOutlined /> },
@@ -45,14 +45,14 @@ const menuItems = [
     ]
   },
   { 
-    key: '/warehouse',
+    key: 'warehouse',
     label: '📦 Kho',
     children: [
       { key: '/feed-storage', label: 'Kho thức ăn', icon: <ShoppingCartOutlined /> },
     ]
   },
   { 
-    key: '/reports',
+    key: 'reports',
     label: '📊 Báo cáo',
     children: [
       { key: '/reports/in-out', label: 'Nhập / xuất', icon: <SwapOutlined /> },
@@ -61,7 +61,7 @@ const menuItems = [
     ]
   },
   { 
-    key: '/system',
+    key: 'system',
     label: '⚙️ Hệ thống',
     children: [
       { key: '/staff', label: 'Nhân sự', icon: <TeamOutlined /> },
