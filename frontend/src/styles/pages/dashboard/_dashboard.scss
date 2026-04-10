@@ -1,37 +1,7 @@
 // Dashboard - Agricultural Theme
 @use "sass:color";
 @use "../../base/variables" as *;
-
-// Mixins
-@mixin farm-card {
-  background: linear-gradient(145deg, #ffffff 0%, $farm-cream 100%);
-  border-radius: 16px;
-  border: 1px solid rgba(45, 90, 39, 0.1);
-  box-shadow: 
-    0 4px 20px rgba(45, 90, 39, 0.08),
-    0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 
-      0 8px 30px rgba(45, 90, 39, 0.15),
-      0 4px 12px rgba(0, 0, 0, 0.08);
-  }
-}
-
-@mixin farm-stat-icon($color) {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  background: linear-gradient(135deg, $color 0%, color.adjust($color, $lightness: 10%) 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba($color, 0.4);
-}
+@use "../../components/ui/cards" as *;
 
 .dashboard {
   &__maincontent {
@@ -74,27 +44,27 @@
     }
 
     // Icon variants
-    &--livestock {
+    &--pigs {
       .stat-card__icon {
-        @include farm-stat-icon($farm-primary);
+        @include stat-icon($farm-primary);
       }
     }
 
     &--barn {
       .stat-card__icon {
-        @include farm-stat-icon($farm-earth);
+        @include stat-icon($farm-earth);
       }
     }
 
     &--staff {
       .stat-card__icon {
-        @include farm-stat-icon($farm-secondary);
+        @include stat-icon($farm-secondary);
       }
     }
 
     &--daily-tasks {
       .stat-card__icon {
-        @include farm-stat-icon($farm-danger);
+        @include stat-icon($farm-danger);
       }
     }
 

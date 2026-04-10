@@ -1,72 +1,58 @@
-import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { ProfileOutlined, LogoutOutlined, TeamOutlined, FileDoneOutlined, HeartOutlined, UsergroupAddOutlined, SwapOutlined, MedicineBoxOutlined, LineChartOutlined, SwapRightOutlined, DollarCircleOutlined, CloseCircleOutlined, IdcardOutlined, CalendarOutlined, ClockCircleOutlined, ShoppingCartOutlined } from '@ant-design/icons';
-import { Menu, Button } from 'antd';
+import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  ProfileOutlined,
+  LogoutOutlined,
+  HeartOutlined,
+  UsergroupAddOutlined,
+  MedicineBoxOutlined,
+  SwapRightOutlined,
+  CloseCircleOutlined,
+  IdcardOutlined,
+  ClockCircleOutlined,
+  ShoppingCartOutlined,
+  HomeOutlined,
+} from "@ant-design/icons";
+import { Menu, Button } from "antd";
 
 const menuItems = [
-  { 
-    key: '/dashboard', 
-    label: '🏠 Tổng quan',  
+  {
+    key: "/dashboard",
+    label: "🏠 Tổng quan",
   },
   {
-    key: 'pigmanage',
-    label: '🐖 Quản lý đàn',
+    key: "pigmanage",
+    label: "🐷 Quản lý đàn",
     children: [
-      { key: '/pigmanage', label: 'Danh sách lợn', icon: <ProfileOutlined /> },
-      { key: '/pigmanage/pigsty-history', label: 'Chuyển chuồng', icon: <SwapRightOutlined /> },
-      { key: '/pigmanage/pig-dead', label: 'Ghi nhận chết', icon: <CloseCircleOutlined /> },
-      { key: '/pigmanage/pig-sell', label: 'Xuất / bán', icon: <DollarCircleOutlined /> },
-    ]
+      { key: "/pigmanage/barns", label: "Chuồng trại", icon: <HomeOutlined /> },
+      { key: "/pigmanage", label: "Danh sách lợn", icon: <ProfileOutlined /> },
+      { key: "/pigmanage/pigsty-history", label: "Chuyển chuồng", icon: <SwapRightOutlined /> },
+      { key: "/pigmanage/pig-dead", label: "Ghi nhận chết", icon: <CloseCircleOutlined /> },
+      { key: "/pigmanage/pig-fattening", label: "Lợn thịt / xuất", icon: <IdcardOutlined /> },
+    ],
   },
-  { 
-    key: 'breeding',
-    label: '🐷 Sinh sản',
+  {
+    key: "reproduction",
+    label: "🐷 Sinh sản",
     children: [
-      { key: '/breeding/mating', label: 'Phối giống', icon: <HeartOutlined /> },
-      { key: '/breeding/pregnancy', label: 'Mang thai', icon: <CalendarOutlined /> },
-      { key: '/breeding/farrowing', label: 'Đẻ con', icon: <UsergroupAddOutlined /> },
-      { key: '/breeding/weaning', label: 'Cai sữa', icon: <SwapOutlined /> },
-    ]
+      { key: "/breeding/pig-breeding", label: "Phối giống", icon: <HeartOutlined /> },
+      { key: "/breeding/pig-farrowing", label: "Đẻ con", icon: <UsergroupAddOutlined /> },
+    ],
   },
-  { 
-    key: 'feed',
-    label: '🍽️ Chăn nuôi',
+  {
+    key: "materials",
+    label: "🍽️ Nguyên vật liệu",
     children: [
-      { key: '/feed/usage', label: 'Sử dụng cám', icon: <ShoppingCartOutlined /> },
-      { key: '/livestock/weight', label: 'Theo dõi trọng lượng', icon: <LineChartOutlined /> },
-    ]
+      { key: "/materials/bran", label: "Sử dụng cám", icon: <ShoppingCartOutlined /> },
+      { key: "/materials/medicine", label: "Sử dụng thuốc", icon: <MedicineBoxOutlined /> },
+    ],
   },
-  { 
-    key: 'veterinary',
-    label: '💊 Thú y',
+  {
+    key: "veterinary",
+    label: "💊 Thú y",
     children: [
-      { key: '/vaccination/usage', label: 'Sử dụng thuốc', icon: <MedicineBoxOutlined /> },
-      { key: '/vaccination/schedule-vaccine', label: 'Tiêm phòng', icon: <ClockCircleOutlined /> },
-    ]
-  },
-  { 
-    key: 'warehouse',
-    label: '📦 Kho',
-    children: [
-      { key: '/feed-storage', label: 'Kho thức ăn', icon: <ShoppingCartOutlined /> },
-    ]
-  },
-  { 
-    key: 'reports',
-    label: '📊 Báo cáo',
-    children: [
-      { key: '/reports/in-out', label: 'Nhập / xuất', icon: <SwapOutlined /> },
-      { key: '/reports/growth', label: 'Tăng trưởng', icon: <LineChartOutlined /> },
-      { key: '/reports/breeding', label: 'Sinh sản', icon: <HeartOutlined /> },
-    ]
-  },
-  { 
-    key: 'system',
-    label: '⚙️ Hệ thống',
-    children: [
-      { key: '/staff', label: 'Nhân sự', icon: <TeamOutlined /> },
-      { key: '/tasks', label: 'Công việc', icon: <FileDoneOutlined /> },
-    ]
+      { key: "/vaccination/schedule-vaccine", label: "Tiêm phòng", icon: <ClockCircleOutlined /> },
+    ],
   },
 ];
 
@@ -74,7 +60,7 @@ export const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const getSelectedKey = () => location.pathname ? [location.pathname] : ['/dashboard'];
+  const getSelectedKey = () => (location.pathname ? [location.pathname] : ["/dashboard"]);
 
   const onClick = (e) => {
     if (e.key) {
@@ -83,16 +69,16 @@ export const Sidebar = () => {
   };
 
   const handleLogout = () => {
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
     <div className="sidebar">
-      <div className="sidebar__header" onClick={() => navigate('/dashboard')}>
-        <div className="sidebar__logo-mark">🐄</div>
+      <div className="sidebar__header" onClick={() => navigate("/dashboard")}>
+        <div className="sidebar__logo-mark">🐷</div>
         <div className="sidebar__logo-text">
           <span className="sidebar__logo-title">FarmPro</span>
-          <span className="sidebar__logo-subtitle">Livestock</span>
+          <span className="sidebar__logo-subtitle">Pig</span>
         </div>
       </div>
 
@@ -114,7 +100,6 @@ export const Sidebar = () => {
           Đăng xuất
         </Button>
       </div>
-
     </div>
   );
 };

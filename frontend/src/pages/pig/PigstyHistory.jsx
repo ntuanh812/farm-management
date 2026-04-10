@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Card,
   Table,
@@ -12,141 +12,118 @@ import {
   Tag,
   message,
 } from "antd";
+import { PageHeader } from "../../components/layout/PageHeader";
+import { usePigFarmStore } from "../../store/pigFarmStore";
+import { barnLabel, isoToDisplay } from "../../domain/pigFarm";
+import { LifecycleStatus } from "../../domain/pigFarm";
 
 const { Option } = Select;
 
-// ===== DATA =====
-const initialPigs = [
-  { code: "DR-2601", status: "Hậu bị", pen: "Chuồng A" },
-  { code: "DR-2602", status: "Đã phối", pen: "Chuồng B" },
-  { code: "DR-2603", status: "Đẻ con", pen: "Chuồng C" },
-  { code: "DR-2604", status: "Cai sữa", pen: "Chuồng A" },
-];
-
-const pens = ["Chuồng A", "Chuồng B", "Chuồng C"];
-const staffs = ["Nguyễn Văn A", "Trần Văn B", "Lê Thị C"];
-
-export default function TransferPage() {
-  const [pigList, setPigList] = useState(initialPigs);
-  const [data, setData] = useState([]);
+export default function PigstyHistory() {
+  const barns = usePigFarmStore((s) => s.barns);
+  const pigs = usePigFarmStore((s) => s.pigs);
+  const staff = usePigFarmStore((s) => s.staff);
+  const movements = usePigFarmStore((s) => s.movements);
+  const movePigs = usePigFarmStore((s) => s.movePigs);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
-
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [statusFilter, setStatusFilter] = useState("all");
 
-  // ===== FILTER =====
-  const filteredPigs = pigList.filter((p) =>
-    statusFilter === "all" ? true : p.status === statusFilter
+  const activePigs = useMemo(
+    () => pigs.filter((p) => p.lifecycleStatus === LifecycleStatus.ACTIVE),
+    [pigs]
   );
 
-  // ===== TABLE MAIN =====
+  const filteredPigs = useMemo(() => {
+    if (statusFilter === "all") return activePigs;
+    return activePigs.filter(
+      (p) => (p.reproductiveLabel || "") === statusFilter
+    );
+  }, [activePigs, statusFilter]);
+
+  const historyRows = useMemo(
+    () =>
+      movements.map((m) => {
+        const pig = pigs.find((p) => p.id === m.pigId);
+        return {
+          key: m.id,
+          date: isoToDisplay(m.movedAt),
+          earTag: pig?.earTag || m.pigId,
+          status: pig?.reproductiveLabel || "—",
+          fromPen: barnLabel(barns, m.fromBarnId),
+          toPen: barnLabel(barns, m.toBarnId),
+          person: m.staffName,
+          note: m.note,
+        };
+      }),
+    [movements, pigs, barns]
+  );
+
   const columns = [
-    {
-      title: "STT",
-      render: (_, __, index) => index + 1,
-    },
-    {
-      title: "Ngày chuyển",
-      dataIndex: "date",
-    },
-    {
-      title: "Số tai",
-      dataIndex: "code",
-    },
+    { title: "STT", render: (_, __, index) => index + 1 },
+    { title: "Ngày chuyển", dataIndex: "date" },
+    { title: "Số tai", dataIndex: "earTag" },
     {
       title: "Trạng thái",
       dataIndex: "status",
       render: (s) => <Tag color="blue">{s}</Tag>,
     },
-    {
-      title: "Từ chuồng",
-      dataIndex: "fromPen",
-    },
+    { title: "Từ chuồng", dataIndex: "fromPen" },
     {
       title: "Sang chuồng",
       dataIndex: "toPen",
       render: (p) => <Tag color="green">{p}</Tag>,
     },
-    {
-      title: "Người thực hiện",
-      dataIndex: "person",
-    },
-    {
-      title: "Ghi chú",
-      dataIndex: "note",
-    },
+    { title: "Người thực hiện", dataIndex: "person" },
+    { title: "Ghi chú", dataIndex: "note" },
   ];
 
-  // ===== TABLE TRONG MODAL =====
   const pigColumns = [
-    {
-      title: "STT",
-      render: (_, __, index) => index + 1,
-    },
-    {
-      title: "Số tai",
-      dataIndex: "code",
-    },
+    { title: "STT", render: (_, __, index) => index + 1 },
+    { title: "Số tai", dataIndex: "earTag" },
     {
       title: "Trạng thái",
-      dataIndex: "status",
-      render: (s) => <Tag color="blue">{s}</Tag>,
+      dataIndex: "reproductiveLabel",
+      render: (s) => <Tag color="blue">{s || "—"}</Tag>,
     },
     {
       title: "Chuồng hiện tại",
-      dataIndex: "pen",
+      dataIndex: "barnId",
+      render: (id) => barnLabel(barns, id),
     },
   ];
 
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: setSelectedRowKeys,
-  };
-
-  // ===== HANDLE =====
   const handleAdd = () => {
     if (selectedRowKeys.length === 0) {
-      message.warning("Chọn ít nhất 1 con lợn");
+      message.warning("Chọn ít nhất 1 con");
       return;
     }
 
     form.validateFields().then((values) => {
-      const selectedPigs = pigList.filter((p) =>
-        selectedRowKeys.includes(p.code)
+      const selected = activePigs.filter((p) =>
+        selectedRowKeys.includes(p.id)
       );
 
-      // ❌ không cho chuyển cùng chuồng
-      const invalid = selectedPigs.some((p) => p.pen === values.toPen);
+      const invalid = selected.some(
+        (p) => p.barnId === values.toBarnId
+      );
+
       if (invalid) {
-        message.error("Có lợn đã ở chuồng này!");
+        message.error("Có con đã ở chuồng này");
         return;
       }
 
-      const newRecords = selectedPigs.map((pig) => ({
-        key: Date.now() + pig.code,
-        date: values.date.format("DD/MM/YYYY"),
-        code: pig.code,
-        status: pig.status,
-        fromPen: pig.pen,
-        toPen: values.toPen,
-        person: values.person,
+      movePigs({
+        pigIds: selectedRowKeys,
+        toBarnId: values.toBarnId,
+        movedAt: values.date.format("YYYY-MM-DD"),
+        staffName: values.person,
         note: values.note,
-      }));
+      });
 
-      // cập nhật chuồng
-      const updatedPigList = pigList.map((p) =>
-        selectedRowKeys.includes(p.code)
-          ? { ...p, pen: values.toPen }
-          : p
-      );
-
-      setPigList(updatedPigList);
-      setData([...newRecords, ...data]);
-
-      message.success("Chuyển chuồng thành công");
-
+      message.success("Đã chuyển chuồng");
       setSelectedRowKeys([]);
       setIsModalOpen(false);
       form.resetFields();
@@ -154,73 +131,99 @@ export default function TransferPage() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      {/* HEADER */}
-      <Card>
-        <Button type="primary" onClick={() => setIsModalOpen(true)}>
-          Thêm chuyển chuồng
-        </Button>
-      </Card>
+    <div className="dashboard">
+      <PageHeader
+        title="Chuyển chuồng"
+        subtitle="Theo dõi lịch sử di chuyển lợn"
+      />
 
-      {/* TABLE */}
-      <Card style={{ marginTop: 20 }}>
-        <Table columns={columns} dataSource={data} />
-      </Card>
+      <div className="dashboard__maincontent">
 
-      {/* MODAL */}
+        {/* ===== STATS ===== */}
+        <div className="stats-grid">
+          <Card className="stat-card stat-card--barn">
+            <div className="stat-card__header">
+              <span className="stat-card__title">Lượt chuyển</span>
+              <div className="stat-card__icon">🏠</div>
+            </div>
+            <div className="stat-card__value">
+              {movements.length}
+            </div>
+          </Card>
+        </div>
+
+        {/* ===== FILTER / ACTION ===== */}
+        <Card className="filter-card">
+          <Space wrap>
+            <Button type="primary" onClick={() => setIsModalOpen(true)}>
+              Thêm chuyển chuồng
+            </Button>
+          </Space>
+        </Card>
+
+        {/* ===== TABLE ===== */}
+        <Card className="table-card">
+          <Table
+            columns={columns}
+            dataSource={historyRows}
+            pagination={{ pageSize: 10 }}
+          />
+        </Card>
+      </div>
+
+      {/* ===== MODAL ===== */}
       <Modal
         title="Chuyển chuồng"
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
-        footer={[
-          <Button onClick={() => setIsModalOpen(false)}>Hủy bỏ</Button>,
-          <Button type="primary" onClick={handleAdd}>
-            Lưu
-          </Button>,
-        ]}
+        onOk={handleAdd}
         width={800}
       >
-        {/* FILTER */}
-        <Select
-          style={{ width: 220, marginBottom: 10 }}
-          value={statusFilter}
-          onChange={setStatusFilter}
-        >
-          <Option value="all">Tất cả trạng thái</Option>
-          <Option value="Hậu bị">Hậu bị</Option>
-          <Option value="Đã phối">Đã phối</Option>
-          <Option value="Đẻ con">Đẻ con</Option>
-          <Option value="Cai sữa">Cai sữa</Option>
-        </Select>
+        <Space style={{ marginBottom: 12 }}>
+          <Select
+            value={statusFilter}
+            onChange={setStatusFilter}
+            style={{ width: 220 }}
+          >
+            <Option value="all">Tất cả</Option>
+            <Option value="Hậu bị">Hậu bị</Option>
+            <Option value="Đã phối">Đã phối</Option>
+            <Option value="Đẻ con">Đẻ con</Option>
+            <Option value="Cai sữa">Cai sữa</Option>
+          </Select>
+        </Space>
 
-        {/* TABLE CHỌN */}
         <Table
-          rowKey="code"
-          rowSelection={rowSelection}
+          rowKey="id"
+          rowSelection={{
+            selectedRowKeys,
+            onChange: setSelectedRowKeys,
+          }}
           columns={pigColumns}
           dataSource={filteredPigs}
           pagination={{ pageSize: 5 }}
           size="small"
         />
 
-        {/* FORM */}
-        <Form form={form} layout="vertical" style={{ marginTop: 20 }}>
+        <Form form={form} layout="vertical" style={{ marginTop: 12 }}>
           <Form.Item
             name="date"
             label="Ngày chuyển"
-            rules={[{ required: true, message: "Chọn ngày" }]}
+            rules={[{ required: true }]}
           >
-            <DatePicker style={{ width: "100%" }} />
+            <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
           </Form.Item>
 
           <Form.Item
-            name="toPen"
+            name="toBarnId"
             label="Chuyển sang chuồng"
-            rules={[{ required: true, message: "Chọn chuồng" }]}
+            rules={[{ required: true }]}
           >
             <Select>
-              {pens.map((p) => (
-                <Option key={p}>{p}</Option>
+              {barns.map((b) => (
+                <Option key={b.id} value={b.id}>
+                  {b.code} — {b.name}
+                </Option>
               ))}
             </Select>
           </Form.Item>
@@ -228,11 +231,13 @@ export default function TransferPage() {
           <Form.Item
             name="person"
             label="Người thực hiện"
-            rules={[{ required: true, message: "Chọn người" }]}
+            rules={[{ required: true }]}
           >
-            <Select placeholder="Chọn người">
-              {staffs.map((s) => (
-                <Option key={s}>{s}</Option>
+            <Select>
+              {staff.map((x) => (
+                <Option key={x.id} value={x.fullName}>
+                  {x.fullName}
+                </Option>
               ))}
             </Select>
           </Form.Item>

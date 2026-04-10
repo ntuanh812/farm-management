@@ -1,0 +1,40 @@
+@use "variables" as *;
+
+html,
+body {
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  color: $gray-900;
+  background: $farm-cream;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Ensure Ant Design inherits app font */
+.ant-typography,
+.ant-btn,
+.ant-input,
+.ant-select,
+.ant-menu,
+.ant-table,
+.ant-form,
+.ant-modal,
+.ant-card {
+  font-family: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: $font-family-heading;
+}

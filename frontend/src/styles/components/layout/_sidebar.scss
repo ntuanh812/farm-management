@@ -165,8 +165,6 @@
       display: none;
     }
   }
-
-  // ✅ SUBMENU KHÔNG SCROLL
   &-sub {
     overflow: visible !important;
     max-height: none !important;
@@ -225,7 +223,7 @@
   &-submenu-title {
     font-weight: 500;
     font-size: 14px;
-    padding-left: 28px !important;
+    padding-left: 20px !important;
 
     &:hover {
       background: rgba(255, 255, 255, 0.12) !important;

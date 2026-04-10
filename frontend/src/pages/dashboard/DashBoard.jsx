@@ -9,9 +9,9 @@ import {
   DashboardOutlined,
   AppleOutlined,
   AuditOutlined,
-  AndroidOutlined
 } from "@ant-design/icons";
-import { activities } from "../../data/mockData";
+import { usePigFarmStore } from "../../store/pigFarmStore";
+import { LifecycleStatus } from "../../domain/pigFarm";
 
 function formatRelativeTime(isoString) {
   const time = new Date(isoString).getTime();
@@ -27,45 +27,51 @@ function formatRelativeTime(isoString) {
 }
 
 export const DashBoard = () => {
+  const barns = usePigFarmStore((s) => s.barns);
+  const pigs = usePigFarmStore((s) => s.pigs);
+  const staff = usePigFarmStore((s) => s.staff);
+  const activities = usePigFarmStore((s) => s.activities);
+
+  const activeCount = pigs.filter((p) => p.lifecycleStatus === LifecycleStatus.ACTIVE).length;
+
   const statsData = [
     {
-      title: "Tổng vật nuôi",
-      value: "1,245",
+      title: "Lợn đang nuôi",
+      value: String(activeCount),
       unit: "con",
-      icon: <AndroidOutlined />,
-      type: "livestock",
-      trend: "+12%",
-      trendUp: true
+      icon: <SnippetsOutlined />,
+      type: "pigs",
+      trend: "—",
+      trendUp: true,
     },
     {
-      title: "Tổng chuồng trại",
-      value: "32",
+      title: "Chuồng",
+      value: String(barns.length),
       unit: "chuồng",
       icon: <HomeOutlined />,
       type: "barn",
-      trend: "+2",
-      trendUp: true
+      trend: "—",
+      trendUp: true,
     },
     {
-      title: "Tổng nhân viên",
-      value: "18",
+      title: "Nhân sự ",
+      value: String(staff.length),
       unit: "người",
       icon: <TeamOutlined />,
       type: "staff",
-      trend: "+3",
-      trendUp: true
+      trend: "—",
+      trendUp: true,
     },
     {
-      title: "Công việc trang trại",
-      value: "7",
-      unit: "công việc",
-      icon: <SnippetsOutlined />,
+      title: "Sự kiện gần đây",
+      value: String(activities.length),
+      unit: "bản ghi",
+      icon: <DashboardOutlined />,
       type: "daily-tasks",
-      trend: "-2",
-      trendUp: false
-    }
+      trend: "—",
+      trendUp: true,
+    },
   ];
-
 
   const getActivityIcon = (type) => {
     switch (type) {
@@ -83,12 +89,11 @@ export const DashBoard = () => {
   return (
     <div className="dashboard">
       <PageHeader
-        title="Tổng quan trang trại"
-        subtitle="Theo dõi tình hình vật nuôi, chuồng trại và hoạt động gần đây"
+        title="Tổng quan trại lợn"
+        subtitle="Dữ liệu lấy từ store (sẵn sàng kết nối MySQL)"
       />
 
       <div className="dashboard__maincontent">
-        {/* Stats Grid */}
         <Row gutter={[20, 20]} className="dashboard-stats">
           {statsData.map((stat, index) => (
             <Col xs={24} sm={12} lg={6} key={index}>
@@ -101,27 +106,28 @@ export const DashBoard = () => {
                   {stat.value}
                   <span className="stat-card__label"> {stat.unit}</span>
                 </div>
-                <div className={`stat-card__trend ${stat.trendUp ? 'stat-card__trend--up' : 'stat-card__trend--down'}`}>
+                <div
+                  className={`stat-card__trend ${stat.trendUp ? "stat-card__trend--up" : "stat-card__trend--down"}`}
+                >
                   {stat.trendUp ? <RiseOutlined /> : <FallOutlined />}
-                  <span>{stat.trend} so với tháng trước</span>
+                  <span>{stat.trend}</span>
                 </div>
               </Card>
             </Col>
           ))}
         </Row>
 
-        {/* Charts Grid */}
         <Row gutter={[20, 20]} style={{ marginTop: 24 }} className="dashboard-charts">
           <Col xs={24} lg={12}>
             <Card className="chart-card">
               <div className="chart-card__header">
-                <h3>📈 Tăng trưởng vật nuôi</h3>
-                <span className="chart-card__badge">Live</span>
+                <h3>Tăng trọng / xuất</h3>
+                <span className="chart-card__badge">Demo</span>
               </div>
               <div className="chart-card__content">
                 <div className="chart-card__placeholder">
                   <div className="placeholder-icon">📊</div>
-                  <p>Biểu đồ tăng trưởng vật nuôi theo tháng</p>
+                  <p>Nối bảng sale_batches + pigs</p>
                 </div>
               </div>
             </Card>
@@ -130,32 +136,30 @@ export const DashBoard = () => {
           <Col xs={24} lg={12}>
             <Card className="chart-card">
               <div className="chart-card__header">
-                <h3>🌾 Tiêu thụ thức ăn</h3>
-                <span className="chart-card__badge">Live</span>
+                <h3>Tiêu thụ cám</h3>
+                <span className="chart-card__badge">Demo</span>
               </div>
               <div className="chart-card__content">
                 <div className="chart-card__placeholder">
                   <div className="placeholder-icon">🌾</div>
-                  <p>Biểu đồ tiêu thụ thức ăn theo tuần</p>
+                  <p>Nối feed_usages theo barn_id</p>
                 </div>
               </div>
             </Card>
           </Col>
         </Row>
 
-        {/* Activity Section */}
         <Row style={{ marginTop: 24 }}>
           <Col span={24}>
             <Card className="activity-card">
               <div className="activity-card__header">
-                <h3>📋 Hoạt động gần đây</h3>
-                <span className="view-all">Xem tất cả →</span>
+                <h3>Hoạt động gần đây</h3>
               </div>
               <div className="activity-card__list">
                 <List
                   dataSource={activities}
                   renderItem={(item) => (
-                    <div className="activity-card__item">
+                    <div className="activity-card__item" key={item.id}>
                       <div className={`activity-card__icon activity-card__icon--${item.icon}`}>
                         {getActivityIcon(item.icon)}
                       </div>
@@ -174,4 +178,3 @@ export const DashBoard = () => {
     </div>
   );
 };
-

@@ -1,8 +1,6 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Card,
-  Row,
-  Col,
   Table,
   Input,
   Button,
@@ -11,75 +9,79 @@ import {
   Form,
   Select,
   DatePicker,
+  message,
 } from "antd";
-import dayjs from "dayjs"; // ✅ thêm dòng này
+import dayjs from "dayjs";
+import { PageHeader } from "../../components/layout/PageHeader";
+import { usePigFarmStore } from "../../store/pigFarmStore";
+import { isoToDisplay } from "../../domain/pigFarm";
+import { LifecycleStatus } from "../../domain/pigFarm";
 
 const { Option } = Select;
 
-// ===== DATA MẪU =====
-const initialDeadData = [
-  {
-    key: 1,
-    code: "DR-2601",
-    status: "Sảy thai",
-    date: "01/04/2026",
-    reason: "Bệnh",
-    person: "Nguyễn Văn A",
-    note: "",
-  },
-  {
-    key: 2,
-    code: "DR-2602",
-    status: "Cai sữa",
-    date: "02/04/2026",
-    reason: "Yếu",
-    person: "Trần Văn B",
-    note: "",
-  },
-];
-
-const pigList = [
-  { code: "DR-2601" },
-  { code: "DR-2602" },
-  { code: "DR-2603" },
-];
-
-const statusOptions = ["Sảy thai", "Cai sữa", "Khác"];
 const reasons = ["Bệnh", "Yếu", "Tai nạn", "Khác"];
-const staffs = ["Nguyễn Văn A", "Trần Văn B", "Lê Thị C"];
 
 export default function PigDead() {
-  const [dataSource, setDataSource] = useState(initialDeadData);
+  const pigs = usePigFarmStore((s) => s.pigs);
+  const deaths = usePigFarmStore((s) => s.deaths);
+  const staff = usePigFarmStore((s) => s.staff);
+  const recordDeath = usePigFarmStore((s) => s.recordDeath);
+  const updateDeath = usePigFarmStore((s) => s.updateDeath);
+
   const [keyword, setKeyword] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
-
   const [form] = Form.useForm();
 
-  const formatDate = (d) => (d ? d.format("DD/MM/YYYY") : "");
+  const activePigs = useMemo(
+    () => pigs.filter((p) => p.lifecycleStatus === LifecycleStatus.ACTIVE),
+    [pigs]
+  );
+
+  const dataSource = useMemo(
+    () =>
+      deaths.map((d) => {
+        const pig = pigs.find((p) => p.id === d.pigId);
+        return {
+          key: d.id,
+          pigId: d.pigId,
+          code: pig?.earTag || d.pigId,
+          status: d.reproductiveSnapshot,
+          date: isoToDisplay(d.diedAt),
+          diedAtISO: d.diedAt,
+          reason: d.cause,
+          person: d.performedBy,
+          note: d.note,
+        };
+      }),
+    [deaths, pigs]
+  );
 
   const filteredData = dataSource.filter((item) =>
     item.code.toLowerCase().includes(keyword.toLowerCase())
   );
 
-  const total = dataSource.length;
-  const miscarriage = dataSource.filter((d) => d.status === "Sảy thai").length;
-  const weaning = dataSource.filter((d) => d.status === "Cai sữa").length;
-
   const handleSave = () => {
     form.validateFields().then((values) => {
-      const newData = {
-        key: editing ? editing.key : Date.now(),
-        ...values,
-        date: formatDate(values.date), // vẫn giữ string
-      };
-
       if (editing) {
-        setDataSource(
-          dataSource.map((d) => (d.key === editing.key ? newData : d))
-        );
+        updateDeath(editing.key, {
+          diedAt: values.date.format("YYYY-MM-DD"),
+          cause: values.reason,
+          reproductiveSnapshot: values.statusSnapshot,
+          performedBy: values.person,
+          note: values.note || "",
+        });
+        message.success("Đã cập nhật");
       } else {
-        setDataSource([newData, ...dataSource]);
+        recordDeath({
+          pigId: values.pigId,
+          diedAt: values.date.format("YYYY-MM-DD"),
+          cause: values.reason,
+          reproductiveSnapshot: values.statusSnapshot,
+          performedBy: values.person,
+          note: values.note || "",
+        });
+        message.success("Đã ghi nhận");
       }
 
       setIsModalOpen(false);
@@ -88,15 +90,16 @@ export default function PigDead() {
     });
   };
 
-  // ✅ FIX Ở ĐÂY
   const handleEdit = (record) => {
     setEditing(record);
-
     form.setFieldsValue({
-      ...record,
-      date: record.date ? dayjs(record.date, "DD/MM/YYYY") : null,
+      pigId: record.pigId,
+      statusSnapshot: record.status,
+      date: record.diedAtISO ? dayjs(record.diedAtISO) : null,
+      reason: record.reason,
+      person: record.person,
+      note: record.note,
     });
-
     setIsModalOpen(true);
   };
 
@@ -119,33 +122,59 @@ export default function PigDead() {
   ];
 
   return (
-    <div style={{ padding: 20 }}>
-      <Row gutter={16}>
-        <Col span={8}><Card><h3>Tổng lợn chết</h3><h1>{total}</h1></Card></Col>
-        <Col span={8}><Card><h3>Sảy thai chết</h3><h1>{miscarriage}</h1></Card></Col>
-        <Col span={8}><Card><h3>Cai sữa chết</h3><h1>{weaning}</h1></Card></Col>
-      </Row>
+    <div className="dashboard">
+      <PageHeader
+        title="Ghi nhận lợn chết"
+        subtitle="Theo dõi và quản lý sự kiện chết"
+      />
 
-      <Card style={{ marginTop: 20 }}>
-        <Space>
-          <Input
-            placeholder="Tìm số tai"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-          />
-          <Button type="primary" onClick={() => setIsModalOpen(true)}>
-            Thêm lợn chết
-          </Button>
-        </Space>
-      </Card>
+      <div className="dashboard__maincontent">
 
-      <Card style={{ marginTop: 20 }}>
-        <Table columns={columns} dataSource={filteredData} />
-      </Card>
+        {/* ===== STATS ===== */}
+        <div className="stats-grid">
+          <Card className="stat-card stat-card--daily-tasks">
+            <div className="stat-card__header">
+              <span className="stat-card__title">Tổng sự kiện</span>
+              <div className="stat-card__icon">💀</div>
+            </div>
+            <div className="stat-card__value">
+              {deaths.length}
+            </div>
+          </Card>
+        </div>
 
+        {/* ===== FILTER ===== */}
+        <Card className="filter-card">
+          <Space wrap>
+            <Input
+              placeholder="Tìm số tai"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            />
+
+            <Button
+              type="primary"
+              onClick={() => {
+                setEditing(null);
+                form.resetFields();
+                setIsModalOpen(true);
+              }}
+            >
+              Thêm
+            </Button>
+          </Space>
+        </Card>
+
+        {/* ===== TABLE ===== */}
+        <Card className="table-card">
+          <Table columns={columns} dataSource={filteredData} />
+        </Card>
+      </div>
+
+      {/* ===== MODAL ===== */}
       <Modal
         open={isModalOpen}
-        title={editing ? "Sửa lợn chết" : "Thêm lợn chết"}
+        title={editing ? "Xem / sửa" : "Thêm lợn chết"}
         onCancel={() => {
           setIsModalOpen(false);
           setEditing(null);
@@ -154,46 +183,70 @@ export default function PigDead() {
         onOk={handleSave}
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="code" label="Số tai" rules={[{ required: true }]}>
-            <Select placeholder="Chọn số tai">
-                {pigList.map((p) => (
-                <Option key={p.code} value={p.code}>
-                    {p.code}
-                </Option>
+          {!editing && (
+            <Form.Item name="pigId" label="Lợn" rules={[{ required: true }]}>
+              <Select placeholder="Chọn lợn đang nuôi">
+                {activePigs.map((p) => (
+                  <Option key={p.id} value={p.id}>
+                    {p.earTag}
+                  </Option>
                 ))}
-            </Select>
+              </Select>
             </Form.Item>
+          )}
 
-          <Form.Item name="status" label="Trạng thái khi chết" rules={[{ required: true }]}>
+          <Form.Item
+            name="statusSnapshot"
+            label="Trạng thái khi chết"
+            rules={[{ required: true }]}
+          >
             <Select>
-              {statusOptions.map((s) => (
-                <Option key={s}>{s}</Option>
-              ))}
+              <Option value="Hậu bị">Hậu bị</Option>
+              <Option value="Đã phối">Đã phối</Option>
+              <Option value="Cai sữa">Cai sữa</Option>
+              <Option value="Sảy thai">Sảy thai</Option>
+              <Option value="Khác">Khác</Option>
             </Select>
           </Form.Item>
 
-          <Form.Item name="date" label="Ngày chết" rules={[{ required: true }]}>
-            <DatePicker style={{ width: "100%" }} />
+          <Form.Item
+            name="date"
+            label="Ngày chết"
+            rules={[{ required: true }]}
+          >
+            <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
           </Form.Item>
 
-          <Form.Item name="reason" label="Nguyên nhân" rules={[{ required: true }]}>
+          <Form.Item
+            name="reason"
+            label="Nguyên nhân"
+            rules={[{ required: true }]}
+          >
             <Select>
               {reasons.map((r) => (
-                <Option key={r}>{r}</Option>
+                <Option key={r} value={r}>
+                  {r}
+                </Option>
               ))}
             </Select>
           </Form.Item>
 
-          <Form.Item name="person" label="Người xử lý" rules={[{ required: true }]}>
+          <Form.Item
+            name="person"
+            label="Người xử lý"
+            rules={[{ required: true }]}
+          >
             <Select>
-              {staffs.map((s) => (
-                <Option key={s}>{s}</Option>
+              {staff.map((x) => (
+                <Option key={x.id} value={x.fullName}>
+                  {x.fullName}
+                </Option>
               ))}
             </Select>
           </Form.Item>
 
           <Form.Item name="note" label="Ghi chú">
-            <Input.TextArea />
+            <Input.TextArea rows={3} />
           </Form.Item>
         </Form>
       </Modal>
