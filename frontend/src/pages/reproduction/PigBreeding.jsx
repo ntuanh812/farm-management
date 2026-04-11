@@ -9,6 +9,7 @@ import {
   DatePicker,
   Input,
   Space,
+  message,
 } from "antd";
 import dayjs from "dayjs";
 import { PageHeader } from "../../components/layout/PageHeader";
@@ -39,20 +40,22 @@ export default function PigBreeding() {
   );
 
   const pregnantList = useMemo(
-    () => activeSows.filter((d) => d.breedingStatus === BreedingStatus.PREGNANT),
+    () =>
+      activeSows.filter((d) => d.breedingStatus === BreedingStatus.PREGNANT),
     [activeSows]
   );
 
+  // ✅ FIX: nếu chưa có breedingStatus thì mặc định là READY
   const readyList = useMemo(
-    () => activeSows.filter((d) => d.breedingStatus === BreedingStatus.READY),
+    () =>
+      activeSows.filter(
+        (d) => !d.breedingStatus || d.breedingStatus === BreedingStatus.READY
+      ),
     [activeSows]
   );
 
   const handleBreed = () => {
     form.validateFields().then((values) => {
-      const pig = readyList.find((p) => p.earTag === values.code);
-      if (!pig) return;
-
       recordBreeding({
         earTag: values.code,
         bredAt: values.date.format("YYYY-MM-DD"),
@@ -60,7 +63,8 @@ export default function PigBreeding() {
         staffName: values.staff,
         note: values.note,
       });
-
+      setFilter("pregnant");
+      message.success("Đã ghi phối giống");
       setIsModalOpen(false);
       form.resetFields();
     });
@@ -79,8 +83,7 @@ export default function PigBreeding() {
     },
     {
       title: "Dự đẻ",
-      render: (r) =>
-        r.expectedFarrowAt ? isoToDisplay(r.expectedFarrowAt) : "",
+      render: (r) => (r.expectedFarrowAt ? isoToDisplay(r.expectedFarrowAt) : ""),
     },
     {
       title: "Chuồng",
@@ -112,11 +115,9 @@ export default function PigBreeding() {
   const tableTitle =
     filter === "pregnant" ? "Lợn đang mang thai" : "Lợn chờ phối";
 
-  const tableData =
-    filter === "pregnant" ? pregnantList : readyList;
+  const tableData = filter === "pregnant" ? pregnantList : readyList;
 
-  const tableColumns =
-    filter === "pregnant" ? pregnantColumns : readyColumns;
+  const tableColumns = filter === "pregnant" ? pregnantColumns : readyColumns;
 
   return (
     <div className="dashboard">
@@ -126,17 +127,13 @@ export default function PigBreeding() {
       />
 
       <div className="dashboard__maincontent">
-
-        {/* ===== STATS ===== */}
         <div className="stats-grid">
           <Card className="stat-card stat-card--pigs">
             <div className="stat-card__header">
               <span className="stat-card__title">Mang thai</span>
               <div className="stat-card__icon">🐖</div>
             </div>
-            <div className="stat-card__value">
-              {pregnantList.length}
-            </div>
+            <div className="stat-card__value">{pregnantList.length}</div>
           </Card>
 
           <Card className="stat-card stat-card--daily-tasks">
@@ -144,13 +141,10 @@ export default function PigBreeding() {
               <span className="stat-card__title">Chờ phối</span>
               <div className="stat-card__icon">⏳</div>
             </div>
-            <div className="stat-card__value">
-              {readyList.length}
-            </div>
+            <div className="stat-card__value">{readyList.length}</div>
           </Card>
         </div>
 
-        {/* ===== FILTER ===== */}
         <Card className="filter-card">
           <Space wrap>
             <Select value={filter} onChange={setFilter}>
@@ -164,7 +158,6 @@ export default function PigBreeding() {
           </Space>
         </Card>
 
-        {/* ===== TABLE ===== */}
         <Card title={tableTitle} className="table-card">
           <Table
             columns={tableColumns}
@@ -175,20 +168,18 @@ export default function PigBreeding() {
         </Card>
       </div>
 
-      {/* ===== MODAL ===== */}
       <Modal
         title="Phối giống"
         open={isModalOpen}
         onOk={handleBreed}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={() => {
+          setIsModalOpen(false);
+          form.resetFields();
+        }}
       >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="code"
-            label="Số tai"
-            rules={[{ required: true }]}
-          >
-            <Select>
+        <Form form={form} layout="vertical" initialValues={{ method: "Tự nhiên" }}>
+          <Form.Item name="code" label="Số tai" rules={[{ required: true }]}>
+            <Select placeholder="Chọn lợn nái">
               {readyList.map((p) => (
                 <Option key={p.id} value={p.earTag}>
                   {p.earTag}
@@ -197,19 +188,11 @@ export default function PigBreeding() {
             </Select>
           </Form.Item>
 
-          <Form.Item
-            name="date"
-            label="Ngày phối"
-            rules={[{ required: true }]}
-          >
+          <Form.Item name="date" label="Ngày phối" rules={[{ required: true }]}>
             <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
           </Form.Item>
 
-          <Form.Item
-            name="method"
-            label="Cách phối"
-            initialValue="Tự nhiên"
-          >
+          <Form.Item name="method" label="Cách phối">
             <Select>
               <Option value="Tự nhiên">Tự nhiên</Option>
               <Option value="Thụ tinh nhân tạo">Thụ tinh nhân tạo</Option>

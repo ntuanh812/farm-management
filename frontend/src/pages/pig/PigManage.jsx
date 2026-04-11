@@ -22,6 +22,7 @@ import {
   isoToDisplay,
   sowReproductiveLabels,
   LifecycleStatus,
+  BreedingStatus,
 } from "../../domain/pigFarm";
 
 const { Option } = Select;
@@ -29,8 +30,14 @@ const { Option } = Select;
 const typeMap = {
   [PigCategory.SOW]: { label: categoryLabels[PigCategory.SOW], color: "green" },
   [PigCategory.BOAR]: { label: categoryLabels[PigCategory.BOAR], color: "red" },
-  [PigCategory.PIGLET]: { label: categoryLabels[PigCategory.PIGLET], color: "gold" },
-  [PigCategory.FATTENING]: { label: categoryLabels[PigCategory.FATTENING], color: "blue" },
+  [PigCategory.PIGLET]: {
+    label: categoryLabels[PigCategory.PIGLET],
+    color: "gold",
+  },
+  [PigCategory.FATTENING]: {
+    label: categoryLabels[PigCategory.FATTENING],
+    color: "blue",
+  },
 };
 
 const statusColor = {
@@ -51,7 +58,9 @@ function displayStatus(pig) {
     if (pig.fattening.phase === "ready") return "Sẵn sàng xuất";
     return "Đang tăng trọng";
   }
+
   if (pig.reproductiveLabel) return pig.reproductiveLabel;
+
   return "—";
 }
 
@@ -63,7 +72,9 @@ export default function PigManagement() {
   const [keyword, setKeyword] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [barnFilter, setBarnFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [form] = Form.useForm();
 
   const activePigs = useMemo(
@@ -71,13 +82,23 @@ export default function PigManagement() {
     [pigs]
   );
 
+  // lấy danh sách trạng thái thực tế từ đàn hiện tại
+  const statusOptions = useMemo(() => {
+    const setStatus = new Set();
+    activePigs.forEach((p) => setStatus.add(displayStatus(p)));
+    return Array.from(setStatus).filter((x) => x !== "—");
+  }, [activePigs]);
+
   const filteredData = useMemo(() => {
     return activePigs
       .filter((item) => {
+        const st = displayStatus(item);
+
         return (
           item.earTag.toLowerCase().includes(keyword.toLowerCase()) &&
           (typeFilter === "all" || item.category === typeFilter) &&
-          (barnFilter === "all" || item.barnId === barnFilter)
+          (barnFilter === "all" || item.barnId === barnFilter) &&
+          (statusFilter === "all" || st === statusFilter)
         );
       })
       .map((p) => ({
@@ -87,7 +108,7 @@ export default function PigManagement() {
         barnDisplay: barnLabel(barns, p.barnId),
         arrivedDisplay: isoToDisplay(p.arrivedAt),
       }));
-  }, [activePigs, keyword, typeFilter, barnFilter, barns]);
+  }, [activePigs, keyword, typeFilter, barnFilter, statusFilter, barns]);
 
   const columns = [
     { title: "Số tai", dataIndex: "earTag" },
@@ -117,13 +138,29 @@ export default function PigManagement() {
         earTag: values.earTag,
         barnId: values.barnId,
         category: values.category,
-        reproductiveLabel: values.reproductiveLabel,
+
+        reproductiveLabel:
+          values.category === PigCategory.SOW ? values.reproductiveLabel : null,
+
+        breedingStatus:
+          values.category === PigCategory.SOW &&
+          values.reproductiveLabel === "Chờ phối"
+            ? BreedingStatus.READY
+            : null,
+
+        fattening:
+          values.category === PigCategory.FATTENING
+            ? { phase: values.fatteningPhase }
+            : null,
+
         ageDays: values.ageDays,
         weightKg: values.weightKg,
+
         arrivedAt: values.arrivedAt
           ? values.arrivedAt.format("YYYY-MM-DD")
           : undefined,
       });
+
       setIsModalOpen(false);
       form.resetFields();
     });
@@ -134,7 +171,6 @@ export default function PigManagement() {
       <PageHeader title="Quản lý đàn" subtitle="Danh sách lợn đang nuôi" />
 
       <div className="dashboard__maincontent">
-
         {/* ===== STATS ===== */}
         <div className="stats-grid">
           <Card className="stat-card stat-card--pigs">
@@ -188,8 +224,12 @@ export default function PigManagement() {
               onChange={(e) => setKeyword(e.target.value)}
             />
 
-            <Select value={typeFilter} onChange={setTypeFilter} style={{ minWidth: 140 }}>
-              <Option value="all">Tất cả</Option>
+            <Select
+              value={typeFilter}
+              onChange={setTypeFilter}
+              style={{ minWidth: 150 }}
+            >
+              <Option value="all">Tất cả loại</Option>
               {Object.keys(typeMap).map((k) => (
                 <Option key={k} value={k}>
                   {typeMap[k].label}
@@ -197,7 +237,24 @@ export default function PigManagement() {
               ))}
             </Select>
 
-            <Select value={barnFilter} onChange={setBarnFilter} style={{ minWidth: 180 }}>
+            <Select
+              value={statusFilter}
+              onChange={setStatusFilter}
+              style={{ minWidth: 180 }}
+            >
+              <Option value="all">Tất cả trạng thái</Option>
+              {statusOptions.map((st) => (
+                <Option key={st} value={st}>
+                  {st}
+                </Option>
+              ))}
+            </Select>
+
+            <Select
+              value={barnFilter}
+              onChange={setBarnFilter}
+              style={{ minWidth: 200 }}
+            >
               <Option value="all">Tất cả chuồng</Option>
               {barns.map((b) => (
                 <Option key={b.id} value={b.id}>
@@ -234,6 +291,7 @@ export default function PigManagement() {
             name="category"
             label="Loại"
             initialValue={PigCategory.FATTENING}
+            rules={[{ required: true }]}
           >
             <Select>
               {Object.keys(typeMap).map((k) => (
@@ -244,30 +302,55 @@ export default function PigManagement() {
             </Select>
           </Form.Item>
 
+          {/* ===== TRẠNG THÁI THEO LOẠI ===== */}
           <Form.Item noStyle shouldUpdate={(p, c) => p.category !== c.category}>
-            {({ getFieldValue }) =>
-              getFieldValue("category") === PigCategory.SOW ? (
-                <Form.Item
-                  name="reproductiveLabel"
-                  label="Giai đoạn sinh sản"
-                  initialValue="Hậu bị"
-                >
-                  <Select>
-                    {sowReproductiveLabels.map((x) => (
-                      <Option key={x} value={x}>
-                        {x}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              ) : null
-            }
+            {({ getFieldValue }) => {
+              const cat = getFieldValue("category");
+
+              if (cat === PigCategory.SOW) {
+                return (
+                  <Form.Item
+                    name="reproductiveLabel"
+                    label="Trạng thái sinh sản"
+                    initialValue="Hậu bị"
+                    rules={[{ required: true }]}
+                  >
+                    <Select>
+                      {sowReproductiveLabels.map((x) => (
+                        <Option key={x} value={x}>
+                          {x}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                );
+              }
+
+              if (cat === PigCategory.FATTENING) {
+                return (
+                  <Form.Item
+                    name="fatteningPhase"
+                    label="Trạng thái"
+                    initialValue="raising"
+                    rules={[{ required: true }]}
+                  >
+                    <Select>
+                      <Option value="raising">Đang tăng trọng</Option>
+                      <Option value="ready">Sẵn sàng xuất</Option>
+                    </Select>
+                  </Form.Item>
+                );
+              }
+
+              return null;
+            }}
           </Form.Item>
 
           <Form.Item
             name="barnId"
             label="Chuồng"
             initialValue={barns[0]?.id}
+            rules={[{ required: true }]}
           >
             <Select>
               {barns.map((b) => (

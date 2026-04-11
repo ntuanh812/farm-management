@@ -9,12 +9,16 @@ import {
   DatePicker,
   InputNumber,
   Space,
+  message,
 } from "antd";
 import dayjs from "dayjs";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { PageHeader } from "../../components/layout/PageHeader";
 import { usePigFarmStore } from "../../store/pigFarmStore";
 import { PigCategory, barnLabel, isoToDisplay } from "../../domain/pigFarm";
 import { BreedingStatus, LifecycleStatus } from "../../domain/pigFarm";
+
+dayjs.extend(isSameOrAfter);
 
 const { Option } = Select;
 
@@ -66,10 +70,7 @@ export default function Farrowing() {
     [pregnantWaiting, todayStart]
   );
 
-  const mothers = useMemo(
-    () => activeSows.filter((p) => p.lactation),
-    [activeSows]
-  );
+  const mothers = useMemo(() => activeSows.filter((p) => p.lactation), [activeSows]);
 
   const handleAdd = () => {
     form.validateFields().then((values) => {
@@ -82,6 +83,7 @@ export default function Farrowing() {
         barnId: values.barnId,
       });
 
+      message.success("Đã ghi nhận đẻ con");
       setIsModalOpen(false);
       form.resetFields();
     });
@@ -101,9 +103,7 @@ export default function Farrowing() {
     {
       title: "Số ngày nuôi",
       render: (r) =>
-        r.lactation?.birthAt
-          ? dayjs().diff(dayjs(r.lactation.birthAt), "day")
-          : "",
+        r.lactation?.birthAt ? dayjs().diff(dayjs(r.lactation.birthAt), "day") : "",
     },
     {
       title: "Chuồng",
@@ -157,12 +157,7 @@ export default function Farrowing() {
       ? "Sắp đẻ"
       : "Chậm đẻ";
 
-  const tableData =
-    filter === "raising"
-      ? mothers
-      : filter === "upcoming"
-      ? upcoming
-      : late;
+  const tableData = filter === "raising" ? mothers : filter === "upcoming" ? upcoming : late;
 
   const tableColumns =
     filter === "raising"
@@ -173,14 +168,9 @@ export default function Farrowing() {
 
   return (
     <div className="dashboard">
-      <PageHeader
-        title="Đẻ con"
-        subtitle="Quản lý sinh sản và nuôi con"
-      />
+      <PageHeader title="Đẻ con" subtitle="Quản lý sinh sản và nuôi con" />
 
       <div className="dashboard__maincontent">
-
-        {/* ===== STATS ===== */}
         <div className="stats-grid">
           <Card className="stat-card stat-card--pigs">
             <div className="stat-card__header">
@@ -207,7 +197,6 @@ export default function Farrowing() {
           </Card>
         </div>
 
-        {/* ===== FILTER ===== */}
         <Card className="filter-card">
           <Space wrap>
             <Select value={filter} onChange={setFilter}>
@@ -222,7 +211,6 @@ export default function Farrowing() {
           </Space>
         </Card>
 
-        {/* ===== TABLE ===== */}
         <Card title={tableTitle} className="table-card">
           <Table
             columns={tableColumns}
@@ -233,20 +221,18 @@ export default function Farrowing() {
         </Card>
       </div>
 
-      {/* ===== MODAL ===== */}
       <Modal
         title="Ghi đẻ"
         open={isModalOpen}
         onOk={handleAdd}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={() => {
+          setIsModalOpen(false);
+          form.resetFields();
+        }}
       >
         <Form form={form} layout="vertical">
-          <Form.Item
-            name="code"
-            label="Số tai"
-            rules={[{ required: true }]}
-          >
-            <Select>
+          <Form.Item name="code" label="Số tai" rules={[{ required: true }]}>
+            <Select placeholder="Chọn lợn nái">
               {[...upcoming, ...late].map((p) => (
                 <Option key={p.id} value={p.earTag}>
                   {p.earTag}
@@ -255,19 +241,11 @@ export default function Farrowing() {
             </Select>
           </Form.Item>
 
-          <Form.Item
-            name="date"
-            label="Ngày đẻ"
-            rules={[{ required: true }]}
-          >
+          <Form.Item name="date" label="Ngày đẻ" rules={[{ required: true }]}>
             <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
           </Form.Item>
 
-          <Form.Item
-            name="total"
-            label="Tổng đẻ"
-            rules={[{ required: true }]}
-          >
+          <Form.Item name="total" label="Tổng đẻ" rules={[{ required: true }]}>
             <InputNumber style={{ width: "100%" }} min={0} />
           </Form.Item>
 
@@ -282,9 +260,7 @@ export default function Farrowing() {
                       style={{ width: "100%" }}
                       min={0}
                       onChange={(v) => {
-                        if (total != null) {
-                          setFieldsValue({ dead: total - (v || 0) });
-                        }
+                        if (total != null) setFieldsValue({ dead: total - (v || 0) });
                       }}
                     />
                   </Form.Item>
@@ -294,9 +270,7 @@ export default function Farrowing() {
                       style={{ width: "100%" }}
                       min={0}
                       onChange={(v) => {
-                        if (total != null) {
-                          setFieldsValue({ alive: total - (v || 0) });
-                        }
+                        if (total != null) setFieldsValue({ alive: total - (v || 0) });
                       }}
                     />
                   </Form.Item>
@@ -305,11 +279,7 @@ export default function Farrowing() {
             }}
           </Form.Item>
 
-          <Form.Item
-            name="barnId"
-            label="Chuồng"
-            rules={[{ required: true }]}
-          >
+          <Form.Item name="barnId" label="Chuồng" rules={[{ required: true }]}>
             <Select>
               {barns.map((b) => (
                 <Option key={b.id} value={b.id}>
