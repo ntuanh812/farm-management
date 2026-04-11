@@ -1,16 +1,5 @@
 import React, { useMemo, useState } from "react";
-import {
-  Card,
-  Table,
-  Button,
-  Modal,
-  Form,
-  Select,
-  DatePicker,
-  InputNumber,
-  Space,
-  message,
-} from "antd";
+import { Card, Table, Select, Space } from "antd";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { PageHeader } from "../../components/layout/PageHeader";
@@ -25,69 +14,43 @@ const { Option } = Select;
 export default function Farrowing() {
   const barns = usePigFarmStore((s) => s.barns);
   const pigs = usePigFarmStore((s) => s.pigs);
-  const recordFarrowing = usePigFarmStore((s) => s.recordFarrowing);
 
   const [filter, setFilter] = useState("raising");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form] = Form.useForm();
 
-  const activeSows = useMemo(
-    () =>
-      pigs.filter(
-        (p) =>
-          p.lifecycleStatus === LifecycleStatus.ACTIVE &&
-          p.category === PigCategory.SOW
-      ),
-    [pigs]
-  );
+  const activeSows = useMemo(() => {
+    return pigs.filter(
+      (p) =>
+        p.lifecycleStatus === LifecycleStatus.ACTIVE &&
+        p.category === PigCategory.SOW
+    );
+  }, [pigs]);
 
   const todayStart = dayjs().startOf("day");
 
-  const pregnantWaiting = useMemo(
-    () =>
-      activeSows.filter(
-        (p) =>
-          p.breedingStatus === BreedingStatus.PREGNANT &&
-          p.expectedFarrowAt &&
-          !p.lactation
-      ),
-    [activeSows]
-  );
+  const pregnantWaiting = useMemo(() => {
+    return activeSows.filter(
+      (p) =>
+        p.breedingStatus === BreedingStatus.PREGNANT &&
+        p.expectedFarrowAt &&
+        !p.lactation
+    );
+  }, [activeSows]);
 
-  const upcoming = useMemo(
-    () =>
-      pregnantWaiting.filter((p) =>
-        dayjs(p.expectedFarrowAt).isSameOrAfter(todayStart, "day")
-      ),
-    [pregnantWaiting, todayStart]
-  );
+  const upcoming = useMemo(() => {
+    return pregnantWaiting.filter((p) =>
+      dayjs(p.expectedFarrowAt).isSameOrAfter(todayStart, "day")
+    );
+  }, [pregnantWaiting, todayStart]);
 
-  const late = useMemo(
-    () =>
-      pregnantWaiting.filter((p) =>
-        dayjs(p.expectedFarrowAt).isBefore(todayStart, "day")
-      ),
-    [pregnantWaiting, todayStart]
-  );
+  const late = useMemo(() => {
+    return pregnantWaiting.filter((p) =>
+      dayjs(p.expectedFarrowAt).isBefore(todayStart, "day")
+    );
+  }, [pregnantWaiting, todayStart]);
 
-  const mothers = useMemo(() => activeSows.filter((p) => p.lactation), [activeSows]);
-
-  const handleAdd = () => {
-    form.validateFields().then((values) => {
-      recordFarrowing({
-        earTag: values.code,
-        birthAt: values.date.format("YYYY-MM-DD"),
-        totalBorn: values.total,
-        alive: values.alive || 0,
-        dead: values.dead || 0,
-        barnId: values.barnId,
-      });
-
-      message.success("Đã ghi nhận đẻ con");
-      setIsModalOpen(false);
-      form.resetFields();
-    });
-  };
+  const mothers = useMemo(() => {
+    return activeSows.filter((p) => p.lactation);
+  }, [activeSows]);
 
   const motherColumns = [
     { title: "STT", render: (_, __, i) => i + 1 },
@@ -97,13 +60,19 @@ export default function Farrowing() {
       dataIndex: "lactation",
       render: (l) => isoToDisplay(l?.birthAt),
     },
-    { title: "Tổng sinh", dataIndex: "lactation", render: (l) => l?.totalBorn },
+    {
+      title: "Tổng sinh",
+      dataIndex: "lactation",
+      render: (l) => l?.totalBorn,
+    },
     { title: "Chết", dataIndex: "lactation", render: (l) => l?.dead },
     { title: "Còn sống", dataIndex: "lactation", render: (l) => l?.alive },
     {
       title: "Số ngày nuôi",
       render: (r) =>
-        r.lactation?.birthAt ? dayjs().diff(dayjs(r.lactation.birthAt), "day") : "",
+        r.lactation?.birthAt
+          ? dayjs().diff(dayjs(r.lactation.birthAt), "day")
+          : "",
     },
     {
       title: "Chuồng",
@@ -157,7 +126,12 @@ export default function Farrowing() {
       ? "Sắp đẻ"
       : "Chậm đẻ";
 
-  const tableData = filter === "raising" ? mothers : filter === "upcoming" ? upcoming : late;
+  const tableData =
+    filter === "raising"
+      ? mothers
+      : filter === "upcoming"
+      ? upcoming
+      : late;
 
   const tableColumns =
     filter === "raising"
@@ -171,6 +145,7 @@ export default function Farrowing() {
       <PageHeader title="Đẻ con" subtitle="Quản lý sinh sản và nuôi con" />
 
       <div className="dashboard__maincontent">
+        {/* ===== STATS ===== */}
         <div className="stats-grid">
           <Card className="stat-card stat-card--pigs">
             <div className="stat-card__header">
@@ -197,6 +172,7 @@ export default function Farrowing() {
           </Card>
         </div>
 
+        {/* ===== FILTER ===== */}
         <Card className="filter-card">
           <Space wrap>
             <Select value={filter} onChange={setFilter}>
@@ -204,13 +180,10 @@ export default function Farrowing() {
               <Option value="upcoming">Sắp đẻ</Option>
               <Option value="late">Chậm đẻ</Option>
             </Select>
-
-            <Button type="primary" onClick={() => setIsModalOpen(true)}>
-              Ghi đẻ
-            </Button>
           </Space>
         </Card>
 
+        {/* ===== TABLE ===== */}
         <Card title={tableTitle} className="table-card">
           <Table
             columns={tableColumns}
@@ -220,76 +193,6 @@ export default function Farrowing() {
           />
         </Card>
       </div>
-
-      <Modal
-        title="Ghi đẻ"
-        open={isModalOpen}
-        onOk={handleAdd}
-        onCancel={() => {
-          setIsModalOpen(false);
-          form.resetFields();
-        }}
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item name="code" label="Số tai" rules={[{ required: true }]}>
-            <Select placeholder="Chọn lợn nái">
-              {[...upcoming, ...late].map((p) => (
-                <Option key={p.id} value={p.earTag}>
-                  {p.earTag}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="date" label="Ngày đẻ" rules={[{ required: true }]}>
-            <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
-          </Form.Item>
-
-          <Form.Item name="total" label="Tổng đẻ" rules={[{ required: true }]}>
-            <InputNumber style={{ width: "100%" }} min={0} />
-          </Form.Item>
-
-          <Form.Item shouldUpdate>
-            {({ getFieldValue, setFieldsValue }) => {
-              const total = getFieldValue("total");
-
-              return (
-                <>
-                  <Form.Item name="alive" label="Sống">
-                    <InputNumber
-                      style={{ width: "100%" }}
-                      min={0}
-                      onChange={(v) => {
-                        if (total != null) setFieldsValue({ dead: total - (v || 0) });
-                      }}
-                    />
-                  </Form.Item>
-
-                  <Form.Item name="dead" label="Chết">
-                    <InputNumber
-                      style={{ width: "100%" }}
-                      min={0}
-                      onChange={(v) => {
-                        if (total != null) setFieldsValue({ alive: total - (v || 0) });
-                      }}
-                    />
-                  </Form.Item>
-                </>
-              );
-            }}
-          </Form.Item>
-
-          <Form.Item name="barnId" label="Chuồng" rules={[{ required: true }]}>
-            <Select>
-              {barns.map((b) => (
-                <Option key={b.id} value={b.id}>
-                  {b.code} — {b.name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-        </Form>
-      </Modal>
     </div>
   );
 }

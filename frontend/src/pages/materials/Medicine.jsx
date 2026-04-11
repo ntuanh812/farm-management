@@ -41,8 +41,11 @@ const PRODUCT_MAP = Object.fromEntries(PRODUCTS.map((p) => [p.name, p]));
 function MedicineModal({ open, onClose, onSubmit, initialValues, barns, pigs }) {
   const [form] = Form.useForm();
   const isEdit = !!initialValues;
-  const barnIdWatch = Form.useWatch("barnId", form);
 
+  const barnIdWatch = Form.useWatch("barnId", form);
+  const pigIdWatch = Form.useWatch("pigId", form);
+
+  // ===== pigs trong chuồng + active =====
   const pigsInBarn = useMemo(() => {
     if (!barnIdWatch) return [];
     return pigs.filter(
@@ -51,6 +54,19 @@ function MedicineModal({ open, onClose, onSubmit, initialValues, barns, pigs }) 
         p.lifecycleStatus === LifecycleStatus.ACTIVE
     );
   }, [pigs, barnIdWatch]);
+
+  // ===== FIX: nếu đang edit mà pigId không nằm trong pigsInBarn => add thêm vào list =====
+  const selectablePigs = useMemo(() => {
+    if (!pigIdWatch) return pigsInBarn;
+
+    const exists = pigsInBarn.some((p) => p.id === pigIdWatch);
+    if (exists) return pigsInBarn;
+
+    const selectedPig = pigs.find((p) => p.id === pigIdWatch);
+    if (!selectedPig) return pigsInBarn;
+
+    return [selectedPig, ...pigsInBarn];
+  }, [pigsInBarn, pigs, pigIdWatch]);
 
   useEffect(() => {
     if (open) {
@@ -114,11 +130,17 @@ function MedicineModal({ open, onClose, onSubmit, initialValues, barns, pigs }) 
           </Select>
         </Form.Item>
 
+        {/* ✅ FIX: Select luôn có option cho pigId đang edit */}
         <Form.Item name="pigId" label="Lợn">
-          <Select allowClear>
-            {pigsInBarn.map((p) => (
+          <Select allowClear placeholder="Chọn lợn">
+            {selectablePigs.map((p) => (
               <Option key={p.id} value={p.id}>
                 {p.earTag}
+                {p.lifecycleStatus !== LifecycleStatus.ACTIVE && (
+                  <span style={{ color: "red", marginLeft: 6 }}>
+                    ({p.lifecycleStatus})
+                  </span>
+                )}
               </Option>
             ))}
           </Select>
@@ -158,7 +180,11 @@ function MedicineModal({ open, onClose, onSubmit, initialValues, barns, pigs }) 
           <InputNumber style={{ width: "100%" }} />
         </Form.Item>
 
-        <Form.Item name="performedBy" label="Người thực hiện" rules={[{ required: true }]}>
+        <Form.Item
+          name="performedBy"
+          label="Người thực hiện"
+          rules={[{ required: true }]}
+        >
           <Input />
         </Form.Item>
       </Form>
@@ -196,8 +222,20 @@ export default function MedicineUsage() {
       title: "",
       render: (_, r) => (
         <Space>
-          <Button icon={<EditOutlined />} onClick={() => { setEditRecord(r); setModalOpen(true); }} />
-          <Popconfirm title="Xóa?" onConfirm={() => { remove(r.id); message.success("Đã xóa"); }}>
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => {
+              setEditRecord(r);
+              setModalOpen(true);
+            }}
+          />
+          <Popconfirm
+            title="Xóa?"
+            onConfirm={() => {
+              remove(r.id);
+              message.success("Đã xóa");
+            }}
+          >
             <Button danger icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
@@ -223,7 +261,6 @@ export default function MedicineUsage() {
     <div className="medicine-page">
       <PageHeader title="Sử dụng thuốc" subtitle="Quản lý thuốc" />
 
-      {/* ===== ACTIONS ===== */}
       <div className="page-actions">
         <Button
           type="primary"
@@ -238,7 +275,6 @@ export default function MedicineUsage() {
         </Button>
       </div>
 
-      {/* ===== TABLE ===== */}
       <Card className="table-card">
         <Table columns={columns} dataSource={medicineUsages} rowKey="id" />
       </Card>

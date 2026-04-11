@@ -17,6 +17,9 @@ const todayISO = () => new Date().toISOString().slice(0, 10);
 function generateMockData() {
   const today = todayISO();
 
+  // =======================
+  // BARNS
+  // =======================
   const barns = [
     {
       id: uid("barn"),
@@ -60,6 +63,9 @@ function generateMockData() {
     },
   ];
 
+  // =======================
+  // STAFF
+  // =======================
   const staff = [
     { id: uid("staff"), fullName: "Nguyễn Văn A", role: "Trưởng trại" },
     { id: uid("staff"), fullName: "Trần Thị B", role: "Thú y" },
@@ -68,22 +74,80 @@ function generateMockData() {
     { id: uid("staff"), fullName: "Hoàng Văn E", role: "Công nhân" },
   ];
 
+  // =======================
+  // PIGS
+  // =======================
   const pigs = [
-    // Sows (8)
-    ...Array.from({ length: 8 }, (_, i) => ({
-      id: uid("pig"),
-      earTag: `NA${String(i + 1).padStart(3, "0")}`,
-      category: PigCategory.SOW,
-      barnId: barns[0].id,
-      reproductiveLabel: "Chờ phối",
-      breedingStatus: BreedingStatus.READY, // ✅ để trang phối giống có dữ liệu
-      ageDays: 800 + Math.floor(Math.random() * 200),
-      weightKg: 180 + Math.floor(Math.random() * 40),
-      arrivedAt: addDaysISO(today, -(365 + Math.floor(Math.random() * 365))),
-      lifecycleStatus: LifecycleStatus.ACTIVE,
-    })),
+    // =======================
+    // SOWS (8) - đảm bảo có READY, PREGNANT, RAISING
+    // =======================
+    ...Array.from({ length: 8 }, (_, i) => {
 
-    // Boars (2)
+      const isRaising = i < 3;
+      const isUpcoming = i >= 3 && i < 5;
+      const isLate = i === 5;
+
+      let bredAt = null;
+      let expectedFarrowAt = null;
+      let lactation = null;
+
+      if (isRaising) {
+        const birthAt = addDaysISO(today, -(10 + i * 4)); // đẻ cách đây 10-18 ngày
+
+        const totalBorn = 10 + Math.floor(Math.random() * 4);
+        const dead = 1 + Math.floor(Math.random() * 2);
+        const alive = totalBorn - dead;
+
+        lactation = {
+          birthAt,
+          totalBorn,
+          alive,
+          dead,
+        };
+      }
+
+      if (isUpcoming) {
+        bredAt = addDaysISO(today, -(90 + i * 2)); // phối cách đây khoảng 90 ngày
+        expectedFarrowAt = addDaysISO(today, +(3 + i)); // chắc chắn tương lai (sắp đẻ)
+      }
+
+      if (isLate) {
+        bredAt = addDaysISO(today, -120);
+        expectedFarrowAt = addDaysISO(today, -5); // chắc chắn quá hạn (chậm đẻ)
+      }
+
+      return {
+        id: uid("pig"),
+        earTag: `NA${String(i + 1).padStart(3, "0")}`,
+        category: PigCategory.SOW,
+        barnId: barns[0].id,
+
+        reproductiveLabel: isRaising
+          ? "Đẻ con"
+          : isUpcoming || isLate
+          ? "Đã phối"
+          : "Chờ phối",
+
+        breedingStatus: isUpcoming || isLate ? BreedingStatus.PREGNANT : BreedingStatus.READY,
+
+        bredAt,
+        expectedFarrowAt,
+        breedStaffName: isUpcoming || isLate ? staff[0].fullName : "",
+        breedMethod: isUpcoming || isLate ? "Tự nhiên" : "",
+        breedNote: "",
+
+        lactation,
+
+        ageDays: 800 + Math.floor(Math.random() * 200),
+        weightKg: 180 + Math.floor(Math.random() * 40),
+        arrivedAt: addDaysISO(today, -(365 + Math.floor(Math.random() * 365))),
+        lifecycleStatus: LifecycleStatus.ACTIVE,
+      };
+    }),
+
+    // =======================
+    // BOARS (2)
+    // =======================
     ...Array.from({ length: 2 }, (_, i) => ({
       id: uid("pig"),
       earTag: `DC${String(i + 1).padStart(3, "0")}`,
@@ -95,7 +159,9 @@ function generateMockData() {
       lifecycleStatus: LifecycleStatus.ACTIVE,
     })),
 
-    // Piglets (10)
+    // =======================
+    // PIGLETS (10)
+    // =======================
     ...Array.from({ length: 10 }, (_, i) => ({
       id: uid("pig"),
       earTag: `LC${String(i + 1).padStart(3, "0")}`,
@@ -107,7 +173,9 @@ function generateMockData() {
       lifecycleStatus: LifecycleStatus.ACTIVE,
     })),
 
-    // Fattening (8 active)
+    // =======================
+    // FATTENING ACTIVE (8)
+    // =======================
     ...Array.from({ length: 8 }, (_, i) => ({
       id: uid("pig"),
       earTag: `TM${String(i + 1).padStart(3, "0")}`,
@@ -120,7 +188,9 @@ function generateMockData() {
       lifecycleStatus: LifecycleStatus.ACTIVE,
     })),
 
-    // Sold fattening (5)
+    // =======================
+    // SOLD FATTENING (5)
+    // =======================
     ...Array.from({ length: 5 }, (_, i) => ({
       id: uid("pig"),
       earTag: `TM${String(20 + i).padStart(3, "0")}`,
@@ -134,6 +204,9 @@ function generateMockData() {
     })),
   ];
 
+  // =======================
+  // SALE BATCHES
+  // =======================
   const saleBatches = Array.from({ length: 3 }, (_, i) => {
     const soldAt = addDaysISO(today, -(10 + i * 7));
 
@@ -141,6 +214,7 @@ function generateMockData() {
       id: uid("sale"),
       soldAt,
       staffName: staff[i % staff.length].fullName,
+      note: "",
       lines: pigs
         .filter((p) => p.lifecycleStatus === LifecycleStatus.SOLD)
         .slice(0, 2)
@@ -156,6 +230,9 @@ function generateMockData() {
     };
   });
 
+  // =======================
+  // MEDICINE USAGES
+  // =======================
   const medicineUsages = Array.from({ length: 6 }, (_, i) => ({
     id: uid("med"),
     usageType: ["Sử dụng cá nhân", "Sử dụng chung"][i % 2],
@@ -171,6 +248,9 @@ function generateMockData() {
     performedBy: staff[i % staff.length].fullName,
   }));
 
+  // =======================
+  // FEED USAGES
+  // =======================
   const feedUsages = Array.from({ length: 8 }, (_, i) => ({
     id: uid("feed"),
     usageType: ["Sử dụng chung", "Sử dụng cá nhân"][i % 2],
@@ -190,7 +270,9 @@ function generateMockData() {
     performedBy: staff[i % staff.length].fullName,
   }));
 
-  // ✅ Vaccinations đúng field theo PigVaccination.jsx
+  // =======================
+  // VACCINATIONS
+  // =======================
   const vaccinations = Array.from({ length: 5 }, (_, i) => ({
     id: uid("vax"),
     pigId: pigs[i * 2]?.id,
@@ -231,22 +313,32 @@ export const usePigFarmStore = create((set, get) => ({
   },
 
   // =======================
-  // PIG
+  // UPDATE PIG
+  // =======================
+  updatePig: (earTag, data) =>
+    set((state) => ({
+      pigs: state.pigs.map((p) =>
+        p.earTag === earTag ? { ...p, ...data } : p
+      ),
+    })),
+
+  // =======================
+  // ADD PIG
   // =======================
   addPig: (data) =>
-    set((s) => ({
+    set((state) => ({
       pigs: [
         {
           id: uid("pig"),
           lifecycleStatus: LifecycleStatus.ACTIVE,
           ...data,
         },
-        ...s.pigs,
+        ...state.pigs,
       ],
     })),
 
   // =======================
-  // MOVE PIGS (PigstyHistory.jsx)
+  // MOVE PIGS
   // =======================
   movePigs: ({ pigIds, toBarnId, movedAt, staffName, note }) =>
     set((state) => {
@@ -275,29 +367,60 @@ export const usePigFarmStore = create((set, get) => ({
   // =======================
   // SALE
   // =======================
-  recordSaleBatch: ({ pigIds, soldAt, pricePerKg, staffName, note }) =>
-    set((s) => {
-      const lines = pigIds.map((id) => {
-        const p = s.pigs.find((x) => x.id === id);
-        return {
-          pigId: id,
-          earTag: p?.earTag || id,
-          weightKg: p?.weightKg || 0,
-          pricePerKg,
-          totalAmount: (p?.weightKg || 0) * pricePerKg,
-          reason: "Xuất bán",
-          note: note || "",
-        };
-      });
+  addSaleBatch: (batch) =>
+    set((state) => ({
+      saleBatches: [
+        {
+          id: uid("sale"),
+          soldAt: batch.soldAt,
+          staffName: batch.staffName || batch.staff || "",
+          note: batch.note || "",
+          lines: (batch.lines || []).map((l) => ({
+            pigId: l.pigId || null,
+            earTag: l.earTag,
+            weightKg: l.weightKg ?? l.weight ?? 0,
+            pricePerKg: l.pricePerKg ?? l.price ?? 0,
+            totalAmount: l.totalAmount ?? 0,
+            reason: l.reason || "Xuất bán",
+            note: l.note || "",
+          })),
+        },
+        ...state.saleBatches,
+      ],
+    })),
+
+  recordSaleBatch: ({ pigIds, soldAt, pricePerKg, staffName, note, lines }) =>
+    set((state) => {
+      const finalLines =
+        lines && lines.length > 0
+          ? lines.map((l) => ({
+              pigId: l.pigId,
+              earTag: l.earTag,
+              weightKg: l.weightKg || 0,
+              pricePerKg,
+              totalAmount: (l.weightKg || 0) * pricePerKg,
+              reason: l.reason || "Xuất bán",
+              note: l.note || "",
+            }))
+          : pigIds.map((id) => {
+              const p = state.pigs.find((x) => x.id === id);
+              const w = p?.weightKg || 0;
+
+              return {
+                pigId: id,
+                earTag: p?.earTag || id,
+                weightKg: w,
+                pricePerKg,
+                totalAmount: w * pricePerKg,
+                reason: "Xuất bán",
+                note: note || "",
+              };
+            });
 
       return {
-        pigs: s.pigs.map((p) =>
+        pigs: state.pigs.map((p) =>
           pigIds.includes(p.id)
-            ? {
-                ...p,
-                lifecycleStatus: LifecycleStatus.SOLD,
-                fattening: null,
-              }
+            ? { ...p, lifecycleStatus: LifecycleStatus.SOLD, fattening: null }
             : p
         ),
         saleBatches: [
@@ -305,15 +428,16 @@ export const usePigFarmStore = create((set, get) => ({
             id: uid("sale"),
             soldAt,
             staffName: staffName || "",
-            lines,
+            note: note || "",
+            lines: finalLines,
           },
-          ...s.saleBatches,
+          ...state.saleBatches,
         ],
       };
     }),
 
   // =======================
-  // DEATH (PigDead.jsx)
+  // DEATH
   // =======================
   recordDeath: ({
     pigId,
@@ -361,7 +485,7 @@ export const usePigFarmStore = create((set, get) => ({
     })),
 
   // =======================
-  // BREEDING (PigBreeding.jsx)
+  // BREEDING
   // =======================
   recordBreeding: ({ earTag, bredAt, method, staffName, note }) =>
     set((state) => ({
@@ -383,7 +507,7 @@ export const usePigFarmStore = create((set, get) => ({
     })),
 
   // =======================
-  // FARROWING (Farrowing.jsx)
+  // FARROWING
   // =======================
   recordFarrowing: ({ earTag, birthAt, totalBorn, alive, dead, barnId }) =>
     set((state) => ({
@@ -406,7 +530,7 @@ export const usePigFarmStore = create((set, get) => ({
     })),
 
   // =======================
-  // VACCINATION (PigVaccination.jsx)
+  // VACCINATION
   // =======================
   addVaccination: (data) =>
     set((state) => ({
@@ -422,47 +546,50 @@ export const usePigFarmStore = create((set, get) => ({
   // BARN
   // =======================
   addBarn: (data) =>
-    set((s) => ({
-      barns: [{ id: uid("barn"), createdAt: todayISO(), ...data }, ...s.barns],
+    set((state) => ({
+      barns: [
+        { id: uid("barn"), createdAt: todayISO(), ...data },
+        ...state.barns,
+      ],
     })),
 
   // =======================
   // MEDICINE
   // =======================
   addMedicineUsage: (data) =>
-    set((s) => ({
-      medicineUsages: [{ id: uid("med"), ...data }, ...s.medicineUsages],
+    set((state) => ({
+      medicineUsages: [{ id: uid("med"), ...data }, ...state.medicineUsages],
     })),
 
   updateMedicineUsage: (id, data) =>
-    set((s) => ({
-      medicineUsages: s.medicineUsages.map((u) =>
+    set((state) => ({
+      medicineUsages: state.medicineUsages.map((u) =>
         u.id === id ? { ...u, ...data } : u
       ),
     })),
 
   deleteMedicineUsage: (id) =>
-    set((s) => ({
-      medicineUsages: s.medicineUsages.filter((u) => u.id !== id),
+    set((state) => ({
+      medicineUsages: state.medicineUsages.filter((u) => u.id !== id),
     })),
 
   // =======================
   // FEED
   // =======================
   addFeedUsage: (data) =>
-    set((s) => ({
-      feedUsages: [{ id: uid("feed"), ...data }, ...s.feedUsages],
+    set((state) => ({
+      feedUsages: [{ id: uid("feed"), ...data }, ...state.feedUsages],
     })),
 
   updateFeedUsage: (id, data) =>
-    set((s) => ({
-      feedUsages: s.feedUsages.map((u) =>
+    set((state) => ({
+      feedUsages: state.feedUsages.map((u) =>
         u.id === id ? { ...u, ...data } : u
       ),
     })),
 
   deleteFeedUsage: (id) =>
-    set((s) => ({
-      feedUsages: s.feedUsages.filter((u) => u.id !== id),
+    set((state) => ({
+      feedUsages: state.feedUsages.filter((u) => u.id !== id),
     })),
 }));

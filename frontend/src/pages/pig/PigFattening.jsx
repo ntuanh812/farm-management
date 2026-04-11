@@ -12,6 +12,7 @@ import {
   InputNumber,
   Row,
   Col,
+  message,
 } from "antd";
 import dayjs from "dayjs";
 import weekOfYear from "dayjs/plugin/weekOfYear";
@@ -27,14 +28,12 @@ export default function PigFattening() {
   const addSaleBatch = usePigFarmStore((s) => s.addSaleBatch);
   const updatePig = usePigFarmStore((s) => s.updatePig);
 
-  // ===== LABEL =====
   const filterLabel = {
     day: "ngày",
     week: "tuần",
     month: "tháng",
   };
 
-  // ===== STATE =====
   const [filterType, setFilterType] = useState("day");
   const [searchEar, setSearchEar] = useState("");
 
@@ -67,12 +66,12 @@ export default function PigFattening() {
   // ===== STATS =====
   const stats = useMemo(() => {
     const revenue = saleBatches.reduce(
-      (s, b) => s + b.lines.reduce((x, l) => x + l.totalAmount, 0),
+      (s, b) => s + b.lines.reduce((x, l) => x + (l.totalAmount || 0), 0),
       0
     );
 
     const totalKg = saleBatches.reduce(
-      (s, b) => s + b.lines.reduce((x, l) => x + (l.weight || 0), 0),
+      (s, b) => s + b.lines.reduce((x, l) => x + (l.weightKg || 0), 0),
       0
     );
 
@@ -90,8 +89,8 @@ export default function PigFattening() {
         key: b.id,
         soldAt: b.soldAt,
         count: b.lines.length,
-        totalKg: b.lines.reduce((s, l) => s + (l.weight || 0), 0),
-        total: b.lines.reduce((s, l) => s + l.totalAmount, 0),
+        totalKg: b.lines.reduce((s, l) => s + (l.weightKg || 0), 0),
+        total: b.lines.reduce((s, l) => s + (l.totalAmount || 0), 0),
         raw: b,
       }));
   }, [saleBatches, searchEar]);
@@ -128,20 +127,20 @@ export default function PigFattening() {
 
   // ===== SELL SINGLE =====
   const handleSell = (values) => {
-    const totalAmount = values.price * values.weight;
+    const totalAmount = (values.pricePerKg || 0) * (values.weightKg || 0);
 
     addSaleBatch({
-      id: Date.now(),
-      soldAt: values.date.toISOString(),
-      staff: values.staff,
+      soldAt: values.date.format("YYYY-MM-DD"),
+      staffName: values.staffName || "",
+      note: values.note || "",
       lines: [
         {
           earTag: values.earTag,
-          weight: values.weight,
-          price: values.price,
+          weightKg: values.weightKg,
+          pricePerKg: values.pricePerKg,
           totalAmount,
-          reason: values.reason,
-          note: values.note,
+          reason: values.reason || "Xuất bán",
+          note: values.note || "",
         },
       ],
     });
@@ -152,21 +151,24 @@ export default function PigFattening() {
 
     setOpenSingle(false);
     form.resetFields();
+    message.success("Đã xuất bán");
   };
 
   // ===== SELL BULK =====
   const handleBulkSell = (values) => {
-    const lines = values.items.map((i) => ({
+    const lines = (values.items || []).map((i) => ({
       earTag: i.earTag,
-      weight: i.weight,
-      price: values.price,
-      totalAmount: i.weight * values.price,
+      weightKg: i.weightKg || 0,
+      pricePerKg: values.pricePerKg,
+      totalAmount: (i.weightKg || 0) * (values.pricePerKg || 0),
+      reason: "Xuất bán",
+      note: "",
     }));
 
     addSaleBatch({
-      id: Date.now(),
-      soldAt: values.date.toISOString(),
-      staff: values.staff,
+      soldAt: values.date.format("YYYY-MM-DD"),
+      staffName: values.staffName || "",
+      note: "",
       lines,
     });
 
@@ -178,6 +180,7 @@ export default function PigFattening() {
 
     setOpenBulk(false);
     bulkForm.resetFields();
+    message.success("Đã xuất bán hàng loạt");
   };
 
   return (
@@ -185,6 +188,7 @@ export default function PigFattening() {
       <PageHeader title="Lợn thịt" subtitle="Xuất bán" />
 
       <div className="dashboard__maincontent">
+        {/* ===== STATS ===== */}
         <Row gutter={[20, 20]} className="dashboard-stats">
           <Col xs={24} sm={12} lg={6}>
             <Card className="stat-card stat-card--pigs">
@@ -239,33 +243,31 @@ export default function PigFattening() {
         <Row gutter={[20, 20]} style={{ marginTop: 24 }}>
           <Col span={24}>
             <Card>
-              <div>
-                <Space wrap>
-                  <Input
-                    placeholder="Tìm số tai"
-                    value={searchEar}
-                    onChange={(e) => setSearchEar(e.target.value)}
-                    style={{ width: 220 }}
-                  />
+              <Space wrap>
+                <Input
+                  placeholder="Tìm số tai"
+                  value={searchEar}
+                  onChange={(e) => setSearchEar(e.target.value)}
+                  style={{ width: 220 }}
+                />
 
-                  <Select
-                    value={filterType}
-                    onChange={setFilterType}
-                    style={{ width: 140 }}
-                    options={[
-                      { value: "day", label: "Ngày" },
-                      { value: "week", label: "Tuần" },
-                      { value: "month", label: "Tháng" },
-                    ]}
-                  />
+                <Select
+                  value={filterType}
+                  onChange={setFilterType}
+                  style={{ width: 140 }}
+                  options={[
+                    { value: "day", label: "Ngày" },
+                    { value: "week", label: "Tuần" },
+                    { value: "month", label: "Tháng" },
+                  ]}
+                />
 
-                  <Button type="primary" onClick={() => setOpenSingle(true)}>
-                    Bán lợn
-                  </Button>
+                <Button type="primary" onClick={() => setOpenSingle(true)}>
+                  Bán lợn
+                </Button>
 
-                  <Button onClick={() => setOpenBulk(true)}>Bán hàng loạt</Button>
-                </Space>
-              </div>
+                <Button onClick={() => setOpenBulk(true)}>Bán hàng loạt</Button>
+              </Space>
             </Card>
           </Col>
         </Row>
@@ -278,39 +280,34 @@ export default function PigFattening() {
                 <h3>Tổng hợp theo {filterLabel[filterType]}</h3>
               </div>
 
-              <div className="activity-card__list">
-                <Table
-                  dataSource={grouped}
-                  rowKey="key"
-                  columns={[
-                    { title: "STT", render: (_, __, i) => i + 1 },
-                    {
-                      title: filterLabel[filterType],
-                      dataIndex: "key",
-                    },
-                    { title: "Số con", dataIndex: "count" },
-                    { title: "Tổng kg", dataIndex: "totalKg" },
-                    {
-                      title: "Thành tiền",
-                      dataIndex: "total",
-                      render: (v) => v.toLocaleString(),
-                    },
-                    {
-                      title: "Thao tác",
-                      render: (_, r) => (
-                        <Button
-                          onClick={() => {
-                            setSelectedBatch(r.raw);
-                            setOpenDetail(true);
-                          }}
-                        >
-                          Xem
-                        </Button>
-                      ),
-                    },
-                  ]}
-                />
-              </div>
+              <Table
+                dataSource={grouped}
+                rowKey="key"
+                columns={[
+                  { title: "STT", render: (_, __, i) => i + 1 },
+                  { title: filterLabel[filterType], dataIndex: "key" },
+                  { title: "Số con", dataIndex: "count" },
+                  { title: "Tổng kg", dataIndex: "totalKg" },
+                  {
+                    title: "Thành tiền",
+                    dataIndex: "total",
+                    render: (v) => (v || 0).toLocaleString(),
+                  },
+                  {
+                    title: "Thao tác",
+                    render: (_, r) => (
+                      <Button
+                        onClick={() => {
+                          setSelectedBatch(r.raw);
+                          setOpenDetail(true);
+                        }}
+                      >
+                        Xem
+                      </Button>
+                    ),
+                  },
+                ]}
+              />
             </Card>
           </Col>
         </Row>
@@ -333,18 +330,22 @@ export default function PigFattening() {
             </Form.Item>
 
             <Form.Item name="date" label="Ngày" rules={[{ required: true }]}>
-              <DatePicker style={{ width: "100%" }} />
+              <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
             </Form.Item>
 
-            <Form.Item name="weight" label="Kg" rules={[{ required: true }]}>
-              <InputNumber style={{ width: "100%" }} />
+            <Form.Item name="weightKg" label="Kg" rules={[{ required: true }]}>
+              <InputNumber style={{ width: "100%" }} min={0} />
             </Form.Item>
 
-            <Form.Item name="price" label="Giá" rules={[{ required: true }]}>
-              <InputNumber style={{ width: "100%" }} />
+            <Form.Item
+              name="pricePerKg"
+              label="Giá/kg"
+              rules={[{ required: true }]}
+            >
+              <InputNumber style={{ width: "100%" }} min={0} />
             </Form.Item>
 
-            <Form.Item name="staff" label="Người thực hiện">
+            <Form.Item name="staffName" label="Người thực hiện">
               <Input />
             </Form.Item>
 
@@ -369,14 +370,18 @@ export default function PigFattening() {
           <Form form={bulkForm} onFinish={handleBulkSell} layout="vertical">
             <Space wrap>
               <Form.Item name="date" label="Ngày" rules={[{ required: true }]}>
-                <DatePicker />
+                <DatePicker format="DD/MM/YYYY" />
               </Form.Item>
 
-              <Form.Item name="price" label="Giá/kg" rules={[{ required: true }]}>
-                <InputNumber />
+              <Form.Item
+                name="pricePerKg"
+                label="Giá/kg"
+                rules={[{ required: true }]}
+              >
+                <InputNumber min={0} />
               </Form.Item>
 
-              <Form.Item name="staff" label="Người thực hiện">
+              <Form.Item name="staffName" label="Người thực hiện">
                 <Input />
               </Form.Item>
             </Space>
@@ -392,7 +397,7 @@ export default function PigFattening() {
                   bulkForm.setFieldsValue({
                     items: values.map((v) => ({
                       earTag: v,
-                      weight: null,
+                      weightKg: null,
                     })),
                   });
                 }}
@@ -420,10 +425,10 @@ export default function PigFattening() {
                         title: "Kg",
                         render: (_, field) => (
                           <Form.Item
-                            name={[field.name, "weight"]}
+                            name={[field.name, "weightKg"]}
                             rules={[{ required: true }]}
                           >
-                            <InputNumber style={{ width: "100%" }} />
+                            <InputNumber style={{ width: "100%" }} min={0} />
                           </Form.Item>
                         ),
                       },
@@ -431,10 +436,13 @@ export default function PigFattening() {
                         title: "Thành tiền",
                         render: (_, field) => {
                           const w =
-                            bulkForm.getFieldValue(["items", field.name, "weight"]) ||
-                            0;
+                            bulkForm.getFieldValue([
+                              "items",
+                              field.name,
+                              "weightKg",
+                            ]) || 0;
 
-                          const p = bulkForm.getFieldValue("price") || 0;
+                          const p = bulkForm.getFieldValue("pricePerKg") || 0;
 
                           return (w * p).toLocaleString();
                         },
@@ -446,7 +454,7 @@ export default function PigFattening() {
                     <b>
                       Tổng kg:{" "}
                       {(bulkForm.getFieldValue("items") || []).reduce(
-                        (s, i) => s + (i?.weight || 0),
+                        (s, i) => s + (i?.weightKg || 0),
                         0
                       )}
                     </b>
@@ -456,7 +464,8 @@ export default function PigFattening() {
                       {(bulkForm.getFieldValue("items") || []).reduce(
                         (s, i) =>
                           s +
-                          (i?.weight || 0) * (bulkForm.getFieldValue("price") || 0),
+                          (i?.weightKg || 0) *
+                            (bulkForm.getFieldValue("pricePerKg") || 0),
                         0
                       ).toLocaleString()}
                     </b>
@@ -476,8 +485,13 @@ export default function PigFattening() {
         >
           {selectedBatch && (
             <>
-              <p>Ngày: {dayjs(selectedBatch.soldAt).format("DD/MM/YYYY")}</p>
-              <p>Người bán: {selectedBatch.staff}</p>
+              <p>
+                Ngày:{" "}
+                {selectedBatch.soldAt
+                  ? dayjs(selectedBatch.soldAt).format("DD/MM/YYYY")
+                  : ""}
+              </p>
+              <p>Người bán: {selectedBatch.staffName}</p>
 
               <Table
                 dataSource={selectedBatch.lines}
@@ -486,9 +500,13 @@ export default function PigFattening() {
                 columns={[
                   { title: "STT", render: (_, __, i) => i + 1 },
                   { title: "Số tai", dataIndex: "earTag" },
-                  { title: "Kg", dataIndex: "weight" },
-                  { title: "Giá", dataIndex: "price" },
-                  { title: "Thành tiền", dataIndex: "totalAmount" },
+                  { title: "Kg", dataIndex: "weightKg" },
+                  { title: "Giá/kg", dataIndex: "pricePerKg" },
+                  {
+                    title: "Thành tiền",
+                    dataIndex: "totalAmount",
+                    render: (v) => (v || 0).toLocaleString(),
+                  },
                   { title: "Nguyên nhân", dataIndex: "reason" },
                   { title: "Ghi chú", dataIndex: "note" },
                 ]}
